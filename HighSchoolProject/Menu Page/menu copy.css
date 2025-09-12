@@ -1,0 +1,264 @@
+/*why did you think stuff carries over? Some properties do not inherit — for example, 
+if you set a width of 50% on an element, all of its descendants do not get a width of 
+50% of their parent's width. 
+If this was the case, CSS would be very frustrating to use! bruh*/ 
+* { 
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	border: none;
+}
+
+html{margin: 0; height: 100%; overflow-x: hidden}
+
+
+.navigation_bar {
+	background-color:#ffffff;
+	height: 132px;
+	width: 100%;
+	border: 1px solid grey;
+	position: fixed;
+	display: flex;
+	flex-wrap: wrap;
+	z-index: 1;
+
+}
+
+
+
+.header {
+	background-color: #8adbd6;
+	height: 41px;
+	border: 1px solid grey;
+	border-top: 0px;
+	z-index: 1;
+	width: 100%;
+}
+
+.header_text {
+	font-size: 26px;
+	font-family: rubik;
+	font-weight: 400;
+	font-style: normal;
+	width: calc(100% - 250px);
+	text-align: center;
+	float: right;
+	height: 41px;
+	padding:7px;
+	
+}
+
+
+
+
+/* Later change text based on size */
+
+
+.koru_logo:hover {
+	background-color: #ffefa6;
+  }
+.koru_logo {
+	display:flex;
+	align-items: center;
+	position: fixed;
+	margin: 10px;
+	width: 240px;
+	height:110px;
+	border: 2px solid #FFCF00;
+	background-color:#FFF1B4;
+	z-index: 2;
+	border-bottom-right-radius: 10px;
+	font-size: 50px;
+	font-family: niveau-grotesk;
+	padding: 7px;
+}
+.koru_logo img {
+	
+	width: 95px;
+	height:95px;
+
+}
+
+.koru_logo span {
+	padding: 15px 15px 0px 15px;
+	height:100%
+}
+
+.page_links {
+	width: calc(100% - 250px);
+	text-align: center;
+	height: 91px;	
+	float: right;
+
+}
+
+
+
+.page_links a {
+
+margin: 12px;
+float: right;
+color: black;
+text-align: center;
+padding: 9px 16px;
+text-decoration: none;
+font-size: 40px;
+font-family: niveau-grotesk;
+border-bottom-right-radius: 10px;
+border: 1px solid grey;
+height: 64px;
+width: 234px;
+
+
+}
+
+#current {
+	border: 2px solid #FFCF00;
+	background-color: #FFFAE4;
+	color: #FFCF00;
+}
+
+
+.page_links a:hover{
+	border: 2px solid #FFCF00;
+	background-color: #FFFAE4;
+	color: #FFCF00;
+}
+
+
+.page_links a:hover ~ #current {color: black; 	border: 1px solid grey; background-color: white;}
+
+
+.info {
+	display: flex;
+	align-items: center;
+	justify-items: center;
+}
+.info img {
+	padding: 20px;
+
+	width: auto;
+	height: 30vh;
+	border: 1px solid grey;
+}
+
+
+
+
+
+.food_info {
+	background-image: url(images/4425931704_271fd1c6bf_c.jpg);
+	line-height:50px;
+	height: 30vh;
+	font-size: 40px;
+	padding:20px;
+	font-family: rubik;
+	border: 1px solid grey;
+
+}
+.food_info span {
+	font-size: 2vw;
+}
+.accordion {
+	margin:20px;
+	margin-bottom: 0px;
+	background-color: #FFFAE4;
+	border: 1px solid grey;
+	color: black;
+	font-style: niveau-grotesk;
+	padding: 18px;
+	width: 100%;
+	text-align: left;
+	font-size: 60px;
+	transition: 0.4s;
+	
+  }
+  
+  .active, .accordion:hover {
+	background-color: #FFF1B4; 
+  }
+  
+  .panel {
+	padding: 0 18px;
+	display: none;
+	background-color: white;
+  }
+
+.heading {
+	padding-top:132px;
+}
+
+.a {
+	width:95vw;
+	margin-top:30px;
+	margin-bottom: 12px;
+}
+
+.center {
+	display: flex;
+	justify-content:center;
+}
+
+}
+/* .map {
+	justify-items:center;
+	align-items: center;
+	margin-top:132px;
+	padding-top:30px;
+	padding-left: 5px;
+
+}
+iframe {
+	width:calc(50vw - 40px);
+	height:calc(100vh - 192px);
+	border: 1px solid grey;
+	border-bottom-right-radius: 10px;
+	z-index:1;
+} */
+
+/* 
+.top_bar {
+	display: flex;
+	justify-items:center;
+	align-items: center;
+	margin-top:90px;
+	padding: 20px;
+
+}
+.top_bar img {
+	height: 30vh;
+	border:1px solid grey;
+}
+.food_bio {
+	border: 1px solid grey;
+	background-image: url(images/4425931704_271fd1c6bf_c.jpg);
+	height: 30vh;
+
+}
+
+/* responsive design not adaptive design  */
+
+/* 
+
+
+
+
+
+
+.lg-view{
+display:inline-block;
+}
+
+.sm-view{
+display:none;
+}
+
+@media screen and (max-width: 500px) {
+.lg-view{
+	display:none;
+}
+
+.sm-view{
+	display:inline-block;
+}
+} */

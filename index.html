@@ -1,78 +1,165 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Themed Website</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ゆめにっき Garden — 夢の庭</title>
+    <!-- NES.css for classic NES UI elements -->
+    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="image.png">
+
+    <!-- google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
-    <div class="sidebar left">
-        <span style = "margin-left: -100px; margin-top:25px; background-image: linear-gradient(#ED3B54, #FFB01F);" class="circle1"></span> <!-- Change px. even with the div changed its still confusing !-->
-    </div>
-    <div class="nav_bar">
-        <nav>
-            <ul>
-                <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#subcom"><i class="fa-solid fa-user-group"></i> Subcoms</a></li> 
-                <li><a href="#games"><i class="fa-solid fa-gamepad"></i> Games</a></li>
-                <li><a href="#contact"><i class="fa-solid fa-link"></i> Links</a></li>
-            </ul>
-        </nav>
-    </div>
-    <div id = "home" class="main-content">  
-        <div class="hover">
+    <div class="grain"></div>
+
+    <div class="frame rope-border rope-thick">
         <header>
-            <h1>A 'Discord' - Themed Website</h1>
-        </header>        
-        <div class="left-image" >
-            <div class="Mascot"> 
-                <img style="flex: 1;" src="cat.jpg"></img>
-            </div>    
-            <h2 style="margin-bottom: 5px;">👋 Hello, I'm Joshua Yee, also just known as 'yee' both online and as a funny nickname. 
-            I am a prospective Software Engineer at UNSW and I hope you like my website!</h2> 
-            <div style:padding="5px;"></div>
-        </div>
-        </div>
-        <h2>My Subcommittees</h2>
-        <div class="left-image hover " id = "subcom">
-            <div style="flex:1">
-                <img style = "margin-top:20px; margin-bottom:20px"src="image.png"></img>    
-                <img style = "margin-bottom:20px"src="illuminate.jpg" ></img>
+            <div>
+                <h1 class="pixel-cloud-title">
+                    <span>Yume / Dream</span>
+                </h1>
+
             </div>
-            <p style="flex: 1; ">In my free time, I like to keep myself involved in various subcommittees. I'm currently apart of the Illuminate subcommittee in CREATE UNSW, which is prospecting to work on a lighting installation for Vivid Sydney next year. This term, I will also be involved with Marketing for the CSE Revue. 
-            </span>
-        </div>
-        <div id = "games" class="games hover">
-            <h2>My Games List</h2>
-            <ul>
-                <div class="game-item">
-                    <span>Counter Strike 2</span>
-                    <img src="CS2.jpg" alt="Counter Strike 2">
+
+            <p class="muted">このサイトは『ゆめにっき』に着想を得た非公式のファンサイトです。<br><em>An
+                    unofficial website inspired by Yume Nikki.</em></p>
+            <nav class="main-nav">
+                <a class="nav-link" href="#map"> <span>Map</span></a>
+                <a class="nav-link" href="#notebook"> <span>Notebook</span></a>
+                <a class="nav-link" href="#about"> <span>About</span></a>
+                <a class="nav-link" href="#showcase"> <span>Showcase</span></a>
+            </nav>
+
+            <!-- <div class="visitor-counter">
+                <span>👁️ 訪問者: <span id="visitorCount">0</span> <em>visitors</em></span>
+            </div> -->
+        </header>
+        <main>
+            <div class="grid-container">
+                <div class="grid-column">
+                    <section id="map" class="card">
+                        <h2>夢の地図 <span class="subtitle">Dream Map</span></h2>
+                        <p class="muted">タイルをクリックして探索 — いくつかのタイルには小さなシーンが隠されています。<br><em>Click tiles to explore — some
+                                tiles
+                                hide small scenes.</em></p>
+                        <div id="grid" class="grid"></div>
+
+                    </section>
+
+                    <section id="about" class="card">
+                        <h2>について <span class="subtitle">About</span></h2>
+                        <div class="about-content">
+                            <img src="image.png" class="avatar" width="96" height="96">
+
+                            <div class="about-text">
+                                <p class="about-intro">
+                                    👋 こんにちは
+                                    <br>
+                                    <br>
+                                    <em>Hello, I'm Joshua Yee, also known as 'yee' both online and as a funny nickname.
+                                        I am a
+                                        prospective Software Engineer at UNSW and I hope you like my website!</em>
+                                </p>
+                                <div class="about-section">
+                                    <h3 class="about-heading"> <span class="subtitle">My Subcommittees</span>
+                                    </h3>
+                                    <p class="about-description">
+                                        <em>In my free time, I like to keep myself involved in various subcommittees.
+                                            I'm
+                                            currently part of the Illuminate subcommittee in CREATE UNSW, working on a
+                                            lighting
+                                            installation for Vivid Sydney next year. This term, I will also be involved
+                                            with
+                                            Marketing for the CSE Revue.</em>
+                                    </p>
+                                </div>
+                                <div class="about-section">
+                                    <h3 class="about-heading">ゲームリスト <span class="subtitle">My Games List</span></h3>
+                                    <div class="game-tags">
+                                        <span class="game-tag">Counter Strike 2,</span>
+                                        <span class="game-tag">Terraria,</span>
+                                        <span class="game-tag">Valorant,</span>
+                                        <span class="game-tag">Dark and Darker,</span>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="about-section">
+                                    <h3 class="about-heading">リンク <span class="subtitle">Links</span></h3>
+                                    <div class="link-buttons">
+                                        <a href="https://www.linkedin.com/in/joshua-yee-604198216/" target="_blank"
+                                            rel="noopener" class="link-btn">LinkedIn</a>
+                                        <a href="https://github.com/jyee4187" target="_blank" rel="noopener"
+                                            class="link-btn">Github</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+                    <section id="image-copy" class="card">
+                        <h2>リサフランク 420 <span class="subtitle">MACINTOSH PLUS</span></h2>
+                        <div class="music-item">
+                            <strong>for the vapourwave enjoyers</strong>
+                            <audio class="music-audio" controls preload="metadata"
+                                src="MACINTOSH PLUS - リサフランク420  現代のコンピュー (reupload).mp3"></audio>
+                        </div>
+                    </section>
+
+
                 </div>
-                <div class="game-item">
-                    <span>Terraria</span>
-                    <img src="Terraria.png" alt="Terraria">
+
+                <div class="grid-column">
+                    <section id="notebook" class="card">
+                        <div class="yn-notebook rope-border">
+                            <h2>日記 <span class="subtitle">Dream Diary</span></h2>
+                            <textarea id="diaryText" class="diary-textbox" readonly></textarea>
+                            <ul id="notes" class="notes-list"></ul>
+                            <div class="yn-spiral"></div>
+                        </div>
+                    </section>
+
+                    <section id="poster" class="card">
+                        <figure class="poster">
+                            <div class="poster-frame rope-border">
+                                <img src="strive_for_your_dreams.gif" class="poster-img">
+                            </div>
+                            <figcaption class="poster-caption">夢に向かって — Strive for your dreams</figcaption>
+                        </figure>
+                    </section>
+
+                    <section id="showcase" class="card">
+                        <h2>展示 <span class="subtitle">Showcase</span></h2>
+                        <div class="badge-grid">
+                            <img src="dreamwindows.gif" width="88" height="31">
+                            <img src="d1a2009d.jpg" width="88" height="31">
+                        </div>
+                        <div class="mal-card">
+                            <div class="mal-left"><img src="images (2).png"></div>
+                            <div class="mal-right">
+                                <div class="mal-title">MyAnimeList</div>
+                                <a class="mal-link" href="https://myanimelist.net/profile/yeemega"
+                                    target="_blank">myanimelist.net/profile/yeemega</a>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-                <div class="game-item">
-                    <span>Valorant</span>
-                    <img src="valorant.png" alt="Valorant">
-                </div>
-                <div class="game-item">
-                    <span>Dark and Darker</span>
-                    <img src="dark and darker.jpg" alt="Dark and Darker">
-                </div>
-            </ul>
-        </div>
-        <div class="contact-buttons" id = "contact">
-            <a href="https://www.linkedin.com/in/joshua-yee-604198216/" class="contact-button email">Linkedin</a>
-            <a href="https://github.com/jyee4187" class="contact-button linkedin">Github</a>
-        </div>
+            </div>
+
+        </main>
     </div>
-    <div class="sidebar right"> 
-        <span style = "margin-left: -100px; position:absolute; background-image: linear-gradient(#5EF1F6, #C35AE4, #ECD1F5);" class="circle2"></span> <!-- Change px. even with the div changed its still confusing !--> 
-    </div>
+
     <script src="script.js"></script>
 </body>
+
 </html>
