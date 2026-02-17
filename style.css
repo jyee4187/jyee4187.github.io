@@ -1,0 +1,102 @@
+body {
+    background-color: #f8f8f8;
+    color: #333;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#app {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 3rem;
+    border-radius: 24px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+#duck-container {
+    margin: 30px 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+
+#duck {
+    /* minimalist, no heavy shadows */
+}
+
+.idle-frame-1 #eyes {
+    transform: translateY(1px);
+}
+
+.idle-frame-2 #crow-body {
+    transform: scale(1.005);
+    transform-origin: center;
+}
+
+#controls {
+    margin: 30px 0;
+}
+
+button {
+    background-color: #333;
+    border: none;
+    color: white;
+    padding: 12px 32px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #000;
+    transform: translateY(-1px);
+}
+
+button.recording {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { background-color: #f0f0f0; }
+    50% { background-color: #e0e0e0; }
+    100% { background-color: #f0f0f0; }
+}
+
+#status {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #999;
+}
+
+#stats {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+#stats h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+#stats p {
+    color: #666;
+    margin: 5px 0;
+}

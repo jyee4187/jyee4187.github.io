@@ -1,164 +1,65 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>ゆめにっき</title>
-    <!-- NES.css for classic NES UI elements -->
-    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
-
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- google fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Press+Start+2P&display=swap"
-        rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crow Debugger</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="grain"></div>
-
-    <div class="frame rope-border rope-thick">
+    <div id="app">
         <header>
-            <div>
-                <h1 class="pixel-cloud-title">
-                    <span>Yume / Dream</span>
-                </h1>
-
-            </div>
-
-            <p class="muted">このサイトは『ゆめにっき』に着想を得た非公式のファンサイトです。<br><em>An
-                    unofficial website inspired by Yume Nikki.</em></p>
-            <nav class="main-nav">
-                <a class="nav-link" href="#map"> <span>Map</span></a>
-                <a class="nav-link" href="#notebook"> <span>Notebook</span></a>
-                <a class="nav-link" href="#about"> <span>About</span></a>
-                <a class="nav-link" href="#showcase"> <span>Showcase</span></a>
-            </nav>
-
-            <!-- <div class="visitor-counter">
-                <span>👁️ 訪問者: <span id="visitorCount">0</span> <em>visitors</em></span>
-            </div> -->
+            <h1>Crow Debugger</h1>
         </header>
         <main>
-            <div class="grid-container">
-                <div class="grid-column">
-                    <section id="map" class="card">
-                        <h2>夢の地図 <span class="subtitle">Dream Map</span></h2>
-                        <p class="muted">タイルをクリックして探索 — いくつかのタイルには小さなシーンが隠されています。<br><em>Click tiles to explore — some
-                                tiles
-                                hide small scenes.</em></p>
-                        <div id="grid" class="grid"></div>
+            <div id="duck-container">
+                <div id="speech-bubble" class="hidden"></div>
+                <svg id="duck" width="200" height="240" viewBox="0 0 200 240">
+                    <g id="crow-body">
+                        <!-- Stick Feet with 3 toes -->
+                        <g id="feet" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round">
+                            <!-- Left Foot -->
+                            <line x1="100" y1="180" x2="100" y2="220" />
+                            <line x1="100" y1="220" x2="90" y2="230" />
+                            <line x1="100" y1="220" x2="100" y2="235" />
+                            <line x1="100" y1="220" x2="110" y2="230" />
+                            <line x1="130" y1="180" x2="130" y2="220" />
+                            <line x1="130" y1="220" x2="120" y2="230" />
+                            <line x1="130" y1="220" x2="130" y2="235" />
+                            <line x1="130" y1="220" x2="140" y2="230" />
+                        </g>
 
-                    </section>
+                        <circle cx="120" cy="120" r="70" fill="#333" stroke="#444" stroke-width="2" />
+                        
+                        <circle cx="70" cy="90" r="50" fill="#444" stroke="#555" stroke-width="2" />
 
-                    <section id="about" class="card">
-                        <h2>について <span class="subtitle">About</span></h2>
-                        <div class="about-content">
-                            <img src="image.png" class="avatar" width="96" height="96">
+                        <!-- Eyes (Sarcastic/Funny) - Positioned on the head -->
+                        <!-- Eyes (Sarc
 
-                            <div class="about-text">
-                                <p class="about-intro">
-                                    👋 こんにちは
-                                    <br>
-                                    <br>
-                                    <em>Hello, I'm Joshua Yee, also known as 'yee' both online and as a funny nickname.
-                                        I am a
-                                        prospective Software Engineer at UNSW and I hope you like my website!</em>
-                                </p>
-                                <div class="about-section">
-                                    <h3 class="about-heading"> <span class="subtitle">My Subcommittees</span>
-                                    </h3>
-                                    <p class="about-description">
-                                        <em>In my free time, I like to keep myself involved in various subcommittees.
-                                            I'm
-                                            currently part of the Illuminate subcommittee in CREATE UNSW, working on a
-                                            lighting
-                                            installation for Vivid Sydney next year. This term, I will also be involved
-                                            with
-                                            Marketing for the CSE Revue.</em>
-                                    </p>
-                                </div>
-                                <div class="about-section">
-                                    <h3 class="about-heading">ゲームリスト <span class="subtitle">My Games List</span></h3>
-                                    <div class="game-tags">
-                                        <span class="game-tag">Counter Strike 2,</span>
-                                        <span class="game-tag">Terraria,</span>
-                                        <span class="game-tag">Valorant,</span>
-                                        <span class="game-tag">Dark and Darker,</span>
-                                    </div>
-                                </div>
-                                <br>
-
-                                <div class="about-section">
-                                    <h3 class="about-heading">リンク <span class="subtitle">Links</span></h3>
-                                    <div class="link-buttons">
-                                        <a href="https://www.linkedin.com/in/joshua-yee-604198216/" target="_blank"
-                                            rel="noopener" class="link-btn">LinkedIn</a>
-                                        <a href="https://github.com/jyee4187" target="_blank" rel="noopener"
-                                            class="link-btn">Github</a>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </section>
-                    <section id="image-copy" class="card">
-                        <h2>リサフランク 420 <span class="subtitle">MACINTOSH PLUS</span></h2>
-                        <div class="music-item">
-                            <strong>for the vapourwave enjoyers</strong>
-                            <audio class="music-audio" controls preload="metadata"
-                                src="MACINTOSH PLUS - リサフランク420  現代のコンピュー (reupload).mp3"></audio>
-                        </div>
-                    </section>
-
-
-                </div>
-
-                <div class="grid-column">
-                    <section id="notebook" class="card">
-                        <div class="yn-notebook rope-border">
-                            <h2>日記 <span class="subtitle">Dream Diary</span></h2>
-                            <textarea id="diaryText" class="diary-textbox" readonly></textarea>
-                            <ul id="notes" class="notes-list"></ul>
-                            <div class="yn-spiral"></div>
-                        </div>
-                    </section>
-
-                    <section id="poster" class="card">
-                        <figure class="poster">
-                            <div class="poster-frame rope-border">
-                                <img src="strive_for_your_dreams.gif" class="poster-img">
-                            </div>
-                            <figcaption class="poster-caption">夢に向かって — Strive for your dreams</figcaption>
-                        </figure>
-                    </section>
-
-                    <section id="showcase" class="card">
-                        <h2>展示 <span class="subtitle">Showcase</span></h2>
-                        <div class="badge-grid">
-                            <img src="dreamwindows.gif" width="88" height="31">
-                            <img src="d1a2009d.jpg" width="88" height="31">
-                        </div>
-                        <div class="mal-card">
-                            <div class="mal-left"><img src="images (2).png"></div>
-                            <div class="mal-right">
-                                <div class="mal-title">MyAnimeList</div>
-                                <a class="mal-link" href="https://myanimelist.net/profile/yeemega"
-                                    target="_blank">myanimelist.net/profile/yeemega</a>
-                            </div>
-                        </div>
-                    </section>
-                </div>
+                        <g id="eyes">
+                            <circle cx="45" cy="70" r="14" fill="white" />
+                            <circle cx="75" cy="70" r="14" fill="white" />
+                            <!-- Pupils  -->
+                            <circle cx="40" cy="70" r="4" fill="#333" />
+                            <circle cx="70" cy="70" r="4" fill="#333" />
+                            <path d="M 32 63 Q 45 55 58 63" fill="none" stroke="#333" stroke-width="2" />
+                            <path d="M 62 63 Q 75 55 88 63" fill="none" stroke="#333" stroke-width="2" />
+                        </g>
+                        <path id="beak" d="M 50 100 Q 25 90 5 105 L 50 120 Z" fill="#ccc" />
+                        </g>
+                </svg>
             </div>
-
+            <div id="controls">
+                <button id="record-btn">Start Debugging</button>
+                <div id="status">Idle</div>
+            </div>
+            <div id="stats">
+                <h2>Session Stats</h2>
+                <p>Time spent: <span id="time-spent">0</span>s</p>
+                <p>Words spoken (approx): <span id="word-count">0</span></p>
+            </div>
         </main>
     </div>
-
     <script src="script.js"></script>
 </body>
-
 </html>

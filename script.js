@@ -1,100 +1,103 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Minimal script: Dream Map + Music carousel
+let isRecording = false;
+let startTime;
+let timerInterval;
+let wordCount = 0;
+let mediaRecorder;
+let audioChunks = [];
 
-    const grid = document.getElementById('grid');
-    const notes = document.getElementById('notes');
-    const diaryText = document.getElementById('diaryText');
+const recordBtn = document.getElementById('record-btn');
+const statusDiv = document.getElementById('status');
+const timeSpentSpan = document.getElementById('time-spent');
+const wordCountSpan = document.getElementById('word-count');
+const duckElement = document.getElementById('duck');
 
-    if (diaryText) diaryText.value = "Dream Journal\n\n";
+// Idle Animation
+let frame = 0;
+setInterval(() => {
+    duckElement.classList.remove('idle-frame-1', 'idle-frame-2');
+    frame = (frame + 1) % 3;
+    if (frame > 0) {
+        duckElement.classList.add(`idle-frame-${frame}`);
+    }
+}, 1000);
 
-    // 12 short tiles: 1-word place or item, Yume Nikki-inspired
-    const scenes = [
-        { title: 'Knife', note: 'Cold glint in the dark.' },
-        { title: 'Flute', note: 'A single hollow note.' },
-        { title: 'Lamp', note: 'Circle of safety.' },
-        { title: 'Neon', note: 'Purple buzz, no source.' },
-        { title: 'Snow', note: 'Footsteps vanish.' },
-        { title: 'Mall', note: 'Shops with no clerks.' },
-        { title: 'Forest', note: 'Leaves don\'t rustle.' },
-        { title: 'Train', note: 'It never arrives.' },
-        { title: 'School', note: 'Desks face the wall.' },
-        { title: 'Door', note: 'Locked from inside.' },
-        { title: 'Cat', note: 'Tail sways, eyes still.' },
-        { title: 'Uboa', note: 'Do not flip the switch.' }
-    ];
+recordBtn.addEventListener('click', async () => {
+    if (!isRecording) {
+        startRecording();
+    } else {
+        stopRecording();
+    }
+});
 
-    // Cloud mask pattern: 12 cells, only some are tiles
-    const cloudPattern = [
-        false, true, true, false, true, false, // row 1 (6)
-        true, true, true, true, true, true   // row 2 (6)
-    ];
+let audioStream;
 
-    if (grid) {
-        let tileIndex = 0;
-        for (let i = 0; i < cloudPattern.length; i++) {
-            if (cloudPattern[i] && tileIndex < scenes.length) {
-                const s = scenes[tileIndex++];
-                const t = document.createElement('div');
-                t.className = 'tile';
-                t.dataset.title = s.title;
-                t.dataset.note = s.note;
-                t.textContent = s.title; // one word label
-                t.addEventListener('click', onTile);
-                grid.appendChild(t);
-            } else {
-                const empty = document.createElement('div');
-                empty.className = 'tile-empty';
-                grid.appendChild(empty);
+async function startRecording() {
+    try {
+        if (!audioStream) {
+            audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+        mediaRecorder = new MediaRecorder(audioStream);
+        
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                audioChunks.push(event.data);
             }
-        }
+        };
+
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            audioChunks = [];
+        };
+
+        mediaRecorder.start();
+        
+        isRecording = true;
+        recordBtn.textContent = 'Stop Debugging';
+        recordBtn.classList.add('recording');
+        statusDiv.textContent = 'Crow is listening...';
+        
+        startTime = Date.now();
+        timerInterval = setInterval(updateStats, 1000);
+    } catch (err) {
+        console.error('Error accessing microphone:', err);
+        alert('Could not access microphone. Please ensure you have given permission.');
     }
+}
 
-    function onTile(e) {
-        const { title, note } = e.currentTarget.dataset;
-        if (diaryText) {
-            diaryText.value = `${title} — ${note}\n` + (diaryText.value || '');
-        }
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        // We no longer stop the tracks here to prevent repetitive permission prompts.
+        // The microphone remains active (indicated by the browser icon), but we stop recording.
     }
+    
+    isRecording = false;
+    recordBtn.textContent = 'Start Debugging';
+    recordBtn.classList.remove('recording');
+    statusDiv.textContent = 'Idle';
+    
+    clearInterval(timerInterval);
+}
 
-    // Tabs for the Showcase section
-    const showcase = document.getElementById('showcase');
-    if (showcase) {
-        showcase.addEventListener('click', (e) => {
-            const btn = e.target.closest('.tab-btn');
-            if (!btn) return;
-            const targetSel = btn.getAttribute('data-target');
-            const target = showcase.querySelector(targetSel);
-            if (!target) return;
 
-            // toggle active button
-            showcase.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            // toggle panels
-            showcase.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            target.classList.add('active');
-        });
-    }
 
-    // Generic carousel controller (images and music)
-    const carousels = Array.from(document.querySelectorAll('.carousel'));
-    carousels.forEach(initCarousel);
+function updateStats() {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    timeSpentSpan.textContent = elapsed;
+    
+    // Very simple "word count" heuristic: 
+    // Assuming roughly 2.1 words per second while talking.
+    wordCount = Math.floor(elapsed * 2.1); 
+    wordCountSpan.textContent = wordCount;
 
-    function initCarousel(root) {
-        const track = root.querySelector('.caro-track');
-        const slides = Array.from(root.querySelectorAll('.caro-slide'));
-        const prev = root.querySelector('.prev');
-        const next = root.querySelector('.next');
-        if (!track || !slides.length) return;
+    // Beak animation removed as per "first sprint" requirements
+}
 
-        let i = 0;
-        const clamp = (n) => Math.max(0, Math.min(n, slides.length - 1));
-        const width = () => slides[0].getBoundingClientRect().width;
-        const update = () => { track.style.transform = `translateX(${-i * width()}px)`; };
 
-        prev && prev.addEventListener('click', () => { i = clamp(i - 1); update(); });
-        next && next.addEventListener('click', () => { i = clamp(i + 1); update(); });
-
-        new ResizeObserver(update).observe(slides[0]);
-        update();
+// Add Keyboard Support
+window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+        e.preventDefault();
+        recordBtn.click();
     }
 });
