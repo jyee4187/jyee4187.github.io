@@ -10,15 +10,14 @@
     <div id="app">
         <header>
             <h1>Crow Debugger</h1>
+            <p class="subtitle">Read your ideas aloud and get mildly sarcastic coaching.</p>
         </header>
         <main>
             <div id="duck-container">
                 <div id="speech-bubble" class="hidden"></div>
                 <svg id="duck" width="200" height="240" viewBox="0 0 200 240">
                     <g id="crow-body">
-                        <!-- Stick Feet with 3 toes -->
                         <g id="feet" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round">
-                            <!-- Left Foot -->
                             <line x1="100" y1="180" x2="100" y2="220" />
                             <line x1="100" y1="220" x2="90" y2="230" />
                             <line x1="100" y1="220" x2="100" y2="235" />
@@ -28,35 +27,69 @@
                             <line x1="130" y1="220" x2="130" y2="235" />
                             <line x1="130" y1="220" x2="140" y2="230" />
                         </g>
-
                         <circle cx="120" cy="120" r="70" fill="#333" stroke="#444" stroke-width="2" />
-                        
                         <circle cx="70" cy="90" r="50" fill="#444" stroke="#555" stroke-width="2" />
-
-                        <!-- Eyes (Sarcastic/Funny) - Positioned on the head -->
-                        <!-- Eyes (Sarc
-
                         <g id="eyes">
                             <circle cx="45" cy="70" r="14" fill="white" />
                             <circle cx="75" cy="70" r="14" fill="white" />
-                            <!-- Pupils  -->
                             <circle cx="40" cy="70" r="4" fill="#333" />
                             <circle cx="70" cy="70" r="4" fill="#333" />
                             <path d="M 32 63 Q 45 55 58 63" fill="none" stroke="#333" stroke-width="2" />
                             <path d="M 62 63 Q 75 55 88 63" fill="none" stroke="#333" stroke-width="2" />
                         </g>
                         <path id="beak" d="M 50 100 Q 25 90 5 105 L 50 120 Z" fill="#ccc" />
-                        </g>
+                    </g>
                 </svg>
             </div>
+
             <div id="controls">
-                <button id="record-btn">Start Debugging</button>
+                <button id="record-btn">Start Read Aloud</button>
+                <button id="speak-btn" class="secondary">Read Last Reply</button>
+                <button id="demo-btn" class="secondary">Try Demo</button>
                 <div id="status">Idle</div>
             </div>
+
+            <div class="panel howto">
+                <h2>How to try it</h2>
+                <ol>
+                    <li>Quick test: click <strong>Try Demo</strong> (no microphone or API key needed).</li>
+                    <li>Real voice test: click <strong>Start Read Aloud</strong>, allow mic permission, then talk.</li>
+                    <li>LLM test: fill endpoint + token + model, then stop recording to send prompt.</li>
+                </ol>
+            </div>
+
+            <div class="panel">
+                <h2>Transcript</h2>
+                <p id="transcript" class="muted">Say something like: “I finally shipped the thing.”</p>
+                <h2>Crow response</h2>
+                <p id="llm-response" class="response">Waiting for your brilliant monologue.</p>
+                <div class="feedback-row">
+                    <button id="feedback-positive" class="tiny">Helpful</button>
+                    <button id="feedback-negative" class="tiny">Too harsh</button>
+                    <input id="feedback-text" type="text" placeholder="Or type feedback: less sarcasm, more direct..." />
+                    <button id="feedback-send" class="tiny">Save feedback</button>
+                </div>
+            </div>
+
+            <div class="panel settings">
+                <h2>LLM API settings</h2>
+                <label>Endpoint URL
+                    <input id="api-url" type="url" placeholder="https://api.openai.com/v1/chat/completions" />
+                </label>
+                <label>Bearer token
+                    <input id="api-key" type="password" placeholder="Paste temporary API key" />
+                </label>
+                <label>Model name
+                    <input id="api-model" type="text" placeholder="gpt-4o-mini" value="gpt-4o-mini" />
+                </label>
+                <p class="muted">Keys stay in your browser storage. For production, proxy requests through your backend.</p>
+            </div>
+
             <div id="stats">
                 <h2>Session Stats</h2>
                 <p>Time spent: <span id="time-spent">0</span>s</p>
                 <p>Words spoken (approx): <span id="word-count">0</span></p>
+                <p>Prompts sent: <span id="prompt-count">0</span></p>
             </div>
         </main>
     </div>
