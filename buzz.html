@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Buzz</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 36px;
+    }
+    h1 {
+      font-size: 11px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #444;
+      font-weight: 400;
+    }
+    #drop {
+      width: 340px;
+      height: 110px;
+      border: 1px solid #2a2a2a;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: #444;
+      letter-spacing: 1px;
+      transition: border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    #drop:hover { border-color: #444; color: #777; }
+    #drop.over  { border-color: #f70; color: #f70; }
+    #drop.loaded { border-color: #3a3a3a; color: #aaa; font-size: 11px; }
+
+    .controls {
+      display: flex;
+      gap: 40px;
+      align-items: flex-end;
+    }
+    .knob-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+    .knob-wrap:hover .tip { opacity: 1; transform: translateY(0); }
+    .tip {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+      padding: 8px 12px;
+      width: 160px;
+      font-size: 10px;
+      line-height: 1.6;
+      color: #888;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s, transform 0.15s;
+      text-align: left;
+      z-index: 10;
+    }
+    .tip strong { color: #f70; font-style: normal; display: block; margin-bottom: 3px; }
+    input[type=range] {
+      -webkit-appearance: slider-vertical;
+      appearance: slider-vertical;
+      width: 24px;
+      height: 90px;
+      cursor: pointer;
+      accent-color: #f70;
+      background: transparent;
+    }
+    label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #444;
+    }
+    .val {
+      font-size: 10px;
+      color: #666;
+      letter-spacing: 1px;
+      height: 14px;
+    }
+    .buttons { display: flex; gap: 10px; }
+    button {
+      background: none;
+      border: 1px solid #2a2a2a;
+      color: #777;
+      padding: 9px 22px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    button:hover:not(:disabled) { border-color: #555; color: #ccc; }
+    button.active { border-color: #f70; color: #f70; }
+    button:disabled { opacity: 0.25; cursor: default; }
+
+    #status {
+      font-size: 10px;
+      color: #444;
+      letter-spacing: 1px;
+      height: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Buzz</h1>
+
+<div id="drop">drop audio / click to browse</div>
+
+<div class="controls">
+  <div class="knob-wrap">
+    <span class="tip"><strong>drive</strong>How hard the signal gets pushed. Low = subtle grit. High = aggressive crunch and harmonics.</span>
+    <div class="val" id="driveVal">8</div>
+    <input type="range" id="drive" min="1" max="20" value="8" step="0.1">
+    <label>drive</label>
+  </div>
+  <div class="knob-wrap">
+    <span class="tip"><strong>center</strong>Which frequencies get buzzed. Low = bass growl (300Hz). High = treble sizzle (7kHz). Mid = classic vocal bite (~2k).</span>
+    <div class="val" id="centerVal">2k</div>
+    <input type="range" id="center" min="300" max="7000" value="2000" step="100">
+    <label>center</label>
+  </div>
+  <div class="knob-wrap">
+    <span class="tip"><strong>mix</strong>Blend of the buzzed sound vs the original. 0% = totally dry. 100% = fully buzzed. Most things sit around 50–80%.</span>
+    <div class="val" id="mixVal">70%</div>
+    <input type="range" id="mix" min="0" max="1" value="0.7" step="0.01">
+    <label>mix</label>
+  </div>
+</div>
+
+
+<div class="buttons">
+  <button id="testBtn">test tone</button>
+  <button id="playBtn" disabled>play</button>
+  <button id="exportBtn" disabled>export wav</button>
+</div>
+
+<div id="status"></div>
+
+<script>
+let ctx, audioBuffer, sourceNode, testOsc, playing = false;
+
+const drop      = document.getElementById('drop');
+const playBtn   = document.getElementById('playBtn');
+const exportBtn = document.getElementById('exportBtn');
+const testBtn   = document.getElementById('testBtn');
+const status    = document.getElementById('status');
+const driveSlider  = document.getElementById('drive');
+const centerSlider = document.getElementById('center');
+const mixSlider    = document.getElementById('mix');
+
+// Live readout
+driveSlider.addEventListener('input', () => {
+  const v = parseFloat(driveSlider.value);
+  document.getElementById('driveVal').textContent = v.toFixed(1);
+});
+centerSlider.addEventListener('input', () => {
+  const v = parseFloat(centerSlider.value);
+  document.getElementById('centerVal').textContent = v >= 1000 ? (v/1000).toFixed(1)+'k' : v+'hz';
+});
+mixSlider.addEventListener('input', () => {
+  const v = parseFloat(mixSlider.value);
+  document.getElementById('mixVal').textContent = Math.round(v * 100) + '%';
+});
+
+// Waveshaper curves
+function hardClipCurve(drive) {
+  const n = 512, curve = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2) / n - 1;
+    curve[i] = (Math.PI + drive) * x / (Math.PI + drive * Math.abs(x));
+  }
+  return curve;
+}
+function softSatCurve() {
+  const n = 512, curve = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2) / n - 1;
+    // cubic soft clip
+    curve[i] = x < -1 ? -2/3 : x > 1 ? 2/3 : x - (x*x*x) / 3;
+  }
+  return curve;
+}
+
+function buildChain(audioCtx, source) {
+  const drive  = parseFloat(driveSlider.value);
+  const center = parseFloat(centerSlider.value);
+  const mix    = parseFloat(mixSlider.value);
+
+  // Pre-gain (drive input into clipper)
+  const preGain = audioCtx.createGain();
+  preGain.gain.value = drive * 0.6;
+
+  // Hard clipper — generates harmonics
+  const clipper = audioCtx.createWaveShaper();
+  clipper.curve = hardClipCurve(drive * 2.5);
+  clipper.oversample = '4x';
+
+  // Bandpass — isolate buzz zone
+  const bp = audioCtx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = center;
+  bp.Q.value = 1.3;
+
+  // Soft saturator — smooth the clip edges
+  const sat = audioCtx.createWaveShaper();
+  sat.curve = softSatCurve();
+  sat.oversample = '2x';
+
+  // Highpass — kill sub mud from buzz layer
+  const hp = audioCtx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 80;
+  hp.Q.value = 0.7;
+
+  // Wet / dry gains
+  const wetGain = audioCtx.createGain();
+  wetGain.gain.value = mix;
+
+  const dryGain = audioCtx.createGain();
+  dryGain.gain.value = 1 - mix * 0.2;
+
+  const out = audioCtx.createGain();
+  out.gain.value = 0.8;
+
+  // Wet path
+  source.connect(preGain);
+  preGain.connect(clipper);
+  clipper.connect(bp);
+  bp.connect(sat);
+  sat.connect(hp);
+  hp.connect(wetGain);
+  wetGain.connect(out);
+
+  // Dry path
+  source.connect(dryGain);
+  dryGain.connect(out);
+
+  return out;
+}
+
+// File loading
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); loadFile(e.dataTransfer.files[0]); });
+drop.addEventListener('click', () => {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'audio/*';
+  inp.onchange = e => loadFile(e.target.files[0]);
+  inp.click();
+});
+
+async function loadFile(file) {
+  if (!file) return;
+  if (!ctx) ctx = new AudioContext();
+  status.textContent = 'decoding...';
+  try {
+    audioBuffer = await ctx.decodeAudioData(await file.arrayBuffer());
+    drop.textContent = file.name;
+    drop.classList.add('loaded');
+    playBtn.disabled = false;
+    exportBtn.disabled = false;
+    status.textContent = `${audioBuffer.duration.toFixed(2)}s  ·  ${audioBuffer.numberOfChannels}ch  ·  ${(audioBuffer.sampleRate/1000).toFixed(1)}kHz`;
+  } catch(e) {
+    status.textContent = 'decode failed';
+  }
+}
+
+// Play / stop
+playBtn.addEventListener('click', () => {
+  if (!ctx || !audioBuffer) return;
+  if (playing) { stopPlayback(); return; }
+  ctx.resume();
+  sourceNode = ctx.createBufferSource();
+  sourceNode.buffer = audioBuffer;
+  buildChain(ctx, sourceNode).connect(ctx.destination);
+  sourceNode.start();
+  playing = true;
+  playBtn.textContent = 'stop';
+  playBtn.classList.add('active');
+  sourceNode.onended = stopPlayback;
+});
+function stopPlayback() {
+  try { sourceNode?.stop(); } catch(e) {}
+  sourceNode = null;
+  playing = false;
+  playBtn.textContent = 'play';
+  playBtn.classList.remove('active');
+}
+
+// Test tone (A1 saw, 55 Hz)
+testBtn.addEventListener('click', () => {
+  if (!ctx) ctx = new AudioContext();
+  ctx.resume();
+  if (testOsc) {
+    testOsc.stop();
+    testOsc = null;
+    testBtn.classList.remove('active');
+    return;
+  }
+  testOsc = ctx.createOscillator();
+  testOsc.type = 'sawtooth';
+  testOsc.frequency.value = 55;
+  buildChain(ctx, testOsc).connect(ctx.destination);
+  testOsc.start();
+  testBtn.classList.add('active');
+  testOsc.onended = () => { testBtn.classList.remove('active'); testOsc = null; };
+});
+
+// Export WAV
+exportBtn.addEventListener('click', async () => {
+  if (!audioBuffer) return;
+  exportBtn.disabled = true;
+  status.textContent = 'rendering...';
+
+  const off = new OfflineAudioContext(
+    audioBuffer.numberOfChannels,
+    audioBuffer.length,
+    audioBuffer.sampleRate
+  );
+  const src = off.createBufferSource();
+  src.buffer = audioBuffer;
+  buildChain(off, src).connect(off.destination);
+  src.start();
+
+  const rendered = await off.startRendering();
+  const wav = toWav(rendered);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([wav], { type: 'audio/wav' }));
+  a.download = 'buzzed.wav';
+  a.click();
+
+  exportBtn.disabled = false;
+  status.textContent = 'saved buzzed.wav';
+});
+
+function toWav(buf) {
+  const ch = buf.numberOfChannels, sr = buf.sampleRate, len = buf.length;
+  const ab = new ArrayBuffer(44 + len * ch * 2);
+  const v = new DataView(ab);
+  const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); v.setUint32(4, 36 + len*ch*2, true);
+  ws(8, 'WAVE'); ws(12, 'fmt '); v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); v.setUint16(22, ch, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr*ch*2, true);
+  v.setUint16(32, ch*2, true); v.setUint16(34, 16, true);
+  ws(36, 'data'); v.setUint32(40, len*ch*2, true);
+  let o = 44;
+  for (let i = 0; i < len; i++)
+    for (let c = 0; c < ch; c++) {
+      const s = Math.max(-1, Math.min(1, buf.getChannelData(c)[i]));
+      v.setInt16(o, s < 0 ? s * 32768 : s * 32767, true);
+      o += 2;
+    }
+  return ab;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Weather</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0b0a10;
+      color: #f2e9ee;
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 32px 24px;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; }
+
+    .center { text-align: center; color: #7a6e8a; font-size: 13px; padding-top: 30vh; }
+
+    .location { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #7a6e8a; margin-bottom: 8px; }
+
+    .today-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+    .temp { font-size: 72px; font-weight: 200; letter-spacing: -3px; line-height: 1; }
+    .unit { font-size: 22px; color: #7a6e8a; }
+    .feels { font-size: 12px; color: #7a6e8a; margin-bottom: 6px; }
+    .condition { font-size: 15px; color: #bfb3c6; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+    .condition-emoji { font-size: 24px; }
+
+    .section-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: #7a6e8a; margin-bottom: 12px;
+    }
+
+    /* today outfit */
+    .outfit { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 32px; }
+    .chip {
+      background: #16121d; border: 1px solid #2e2537;
+      color: #f2e9ee; font-size: 12px; padding: 6px 12px; border-radius: 2px;
+    }
+    .chip.warn { border-color: #f7a800; color: #f7a800; background: #1e1800; }
+
+    .divider { height: 1px; background: #2e2537; margin-bottom: 32px; }
+
+    /* weekly grid */
+    .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 32px; }
+    .day-col {
+      background: #16121d; border: 1px solid #2e2537;
+      padding: 10px 4px; text-align: center; border-radius: 2px;
+    }
+    .day-col.today { border-color: #b35cff; }
+    .day-name  { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #7a6e8a; margin-bottom: 6px; }
+    .day-emoji { font-size: 18px; margin-bottom: 6px; }
+    .day-max   { font-size: 13px; }
+    .day-min   { font-size: 11px; color: #7a6e8a; margin-top: 2px; }
+    .day-rain  { font-size: 10px; color: #7ab3ff; margin-top: 4px; }
+
+    /* day detail */
+    .week-detail { display: grid; gap: 12px; }
+    .day-row {
+      border-left: 2px solid #2e2537; padding-left: 14px;
+      display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start;
+    }
+    .day-row.today { border-left-color: #b35cff; }
+    .day-info-name { font-size: 12px; margin-bottom: 3px; }
+    .day-info-cond { font-size: 11px; color: #7a6e8a; }
+    .day-info-temp { font-size: 11px; color: #7a6e8a; margin-top: 2px; }
+    .day-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .day-chip {
+      font-size: 10px; padding: 3px 8px;
+      border: 1px solid #2e2537; background: #16121d; color: #f2e9ee; border-radius: 2px;
+    }
+    .day-chip.warn { border-color: #f7a80066; color: #f7a800; }
+
+    .error-msg { color: #e04060; font-size: 13px; text-align: center; padding-top: 30vh; line-height: 1.6; }
+    .retry {
+      display: block; margin: 16px auto 0;
+      background: none; border: 1px solid #2e2537; color: #7a6e8a;
+      padding: 8px 20px; font-size: 12px; cursor: pointer; border-radius: 2px;
+    }
+    .retry:hover { border-color: #b35cff; color: #b35cff; }
+
+    @media (max-width: 480px) {
+      .week { grid-template-columns: repeat(4, 1fr); }
+      .day-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div id="root"></div>
+</div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+(function () {
+  const { useState, useEffect } = React;
+  const h = React.createElement;
+
+  const WMO = {
+    0:'Clear sky', 1:'Mainly clear', 2:'Partly cloudy', 3:'Overcast',
+    45:'Fog', 48:'Icy fog',
+    51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+    61:'Light rain', 63:'Rain', 65:'Heavy rain',
+    71:'Light snow', 73:'Snow', 75:'Heavy snow', 77:'Snow grains',
+    80:'Showers', 81:'Heavy showers', 82:'Violent showers',
+    85:'Snow showers', 86:'Heavy snow showers',
+    95:'Thunderstorm', 96:'Thunderstorm + hail', 99:'Thunderstorm + heavy hail',
+  };
+
+  function wmoEmoji(code) {
+    if (code === 0) return '☀️';
+    if (code <= 3)  return '⛅';
+    if (code <= 48) return '🌫️';
+    if (code <= 55) return '🌦️';
+    if (code <= 67) return '🌧️';
+    if (code <= 77) return '❄️';
+    if (code <= 82) return '🌧️';
+    if (code <= 86) return '🌨️';
+    return '⛈️';
+  }
+
+  const RAIN = [51,53,55,56,57,61,63,65,66,67,80,81,82];
+  const SNOW = [71,73,75,77,85,86];
+
+  function outfit(apparent, code, wind, rain) {
+    const base = [], warn = [];
+    if (apparent < 0)       { base.push('thermal layer', 'heavy coat', 'scarf & gloves', 'warm boots'); }
+    else if (apparent < 8)  { base.push('warm jacket', 'jeans', 'closed shoes'); }
+    else if (apparent < 15) { base.push('hoodie', 'jeans', 'sneakers'); }
+    else if (apparent < 22) { base.push('t-shirt', 'light pants'); }
+    else if (apparent < 28) { base.push('t-shirt', 'shorts', 'sunscreen'); }
+    else                    { base.push('minimal', 'shorts', 'sunscreen', 'hat'); }
+    if (RAIN.includes(code) || rain > 50) warn.push('umbrella');
+    if (SNOW.includes(code)) warn.push('waterproof boots');
+    if (wind > 35) warn.push('windbreaker');
+    if ([0,1,2].includes(code) && apparent > 16) base.push('sunglasses');
+    return { base, warn };
+  }
+
+  function dayLabel(dateStr, i) {
+    if (i === 0) return 'Today';
+    if (i === 1) return 'Tomorrow';
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString('en', { weekday: 'short' });
+  }
+
+  async function fetchWeather() {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000 })
+    );
+    const { latitude: lat, longitude: lon } = pos.coords;
+
+    const [wRes, gRes] = await Promise.all([
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,wind_speed_10m_max,precipitation_probability_max&timezone=auto&forecast_days=7`),
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`),
+    ]);
+    const w = await wRes.json();
+    const g = await gRes.json();
+    const c = w.current;
+    const d = w.daily;
+
+    return {
+      city: g.address?.city || g.address?.town || g.address?.suburb || 'here',
+      temp: Math.round(c.temperature_2m),
+      apparent: Math.round(c.apparent_temperature),
+      code: c.weather_code,
+      wind: Math.round(c.wind_speed_10m),
+      days: d.time.map((date, i) => ({
+        date, label: dayLabel(date, i),
+        code: d.weather_code[i],
+        max: Math.round(d.temperature_2m_max[i]),
+        min: Math.round(d.temperature_2m_min[i]),
+        apparentMax: Math.round(d.apparent_temperature_max[i]),
+        wind: Math.round(d.wind_speed_10m_max[i]),
+        rain: d.precipitation_probability_max[i],
+      })),
+    };
+  }
+
+  function App() {
+    const [data, setData] = useState(null);
+    const [phase, setPhase] = useState('loading');
+
+    function load() {
+      setPhase('loading'); setData(null);
+      fetchWeather()
+        .then(d => { setData(d); setPhase('done'); })
+        .catch(e => setPhase(e?.code === 1 ? 'denied' : 'error'));
+    }
+
+    useEffect(() => { load(); }, []);
+
+    if (phase === 'loading') return h('div', { className: 'center' }, 'getting your location…');
+    if (phase === 'denied')  return h('div', { className: 'error-msg' }, 'Location access denied. Allow it in your browser.');
+    if (phase === 'error')   return h('div', { className: 'error-msg' },
+      'Could not fetch weather.',
+      h('button', { className: 'retry', onClick: load }, 'retry')
+    );
+
+    const { city, temp, apparent, code, wind, days } = data;
+    const today = days[0];
+    const { base, warn } = outfit(apparent, code, wind, today.rain);
+
+    return h('div', null,
+      h('div', { className: 'location' }, city),
+      h('div', { className: 'today-row' },
+        h('span', { className: 'temp' }, temp),
+        h('span', { className: 'unit' }, '°C')
+      ),
+      h('div', { className: 'feels' }, `feels like ${apparent}°  ·  wind ${wind} km/h`),
+      h('div', { className: 'condition' },
+        h('span', { className: 'condition-emoji' }, wmoEmoji(code)),
+        WMO[code] || 'Unknown'
+      ),
+
+      h('div', { className: 'section-label' }, 'wear today'),
+      h('div', { className: 'outfit' },
+        ...base.map(item => h('span', { key: item, className: 'chip' }, item)),
+        ...warn.map(item => h('span', { key: item, className: 'chip warn' }, item))
+      ),
+
+      h('div', { className: 'divider' }),
+
+      h('div', { className: 'section-label' }, '7-day'),
+      h('div', { className: 'week' },
+        days.map((day, i) =>
+          h('div', { key: day.date, className: 'day-col' + (i === 0 ? ' today' : '') },
+            h('div', { className: 'day-name' }, day.label.slice(0, 3)),
+            h('div', { className: 'day-emoji' }, wmoEmoji(day.code)),
+            h('div', { className: 'day-max' }, day.max + '°'),
+            h('div', { className: 'day-min' }, day.min + '°'),
+            day.rain > 40 ? h('div', { className: 'day-rain' }, day.rain + '%') : null
+          )
+        )
+      ),
+
+      h('div', { className: 'section-label' }, 'what to wear each day'),
+      h('div', { className: 'week-detail' },
+        days.map((day, i) => {
+          const { base: b, warn: w } = outfit(day.apparentMax, day.code, day.wind, day.rain);
+          return h('div', { key: day.date, className: 'day-row' + (i === 0 ? ' today' : '') },
+            h('div', null,
+              h('div', { className: 'day-info-name' }, day.label),
+              h('div', { className: 'day-info-cond' }, wmoEmoji(day.code) + ' ' + (WMO[day.code] || '')),
+              h('div', { className: 'day-info-temp' }, `${day.max}° / ${day.min}°`)
+            ),
+            h('div', { className: 'day-chips' },
+              ...b.map(item => h('span', { key: item, className: 'day-chip' }, item)),
+              ...w.map(item => h('span', { key: item, className: 'day-chip warn' }, item))
+            )
+          );
+        })
+      )
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(h(App, null));
+})();
+</script>
+</body>
+</html>

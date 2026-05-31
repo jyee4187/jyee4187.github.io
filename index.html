@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ゆめにっき Garden — 夢の庭</title>
+  <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="grain"></div>
+
+  <div class="frame rope-border rope-thick">
+    <header>
+      <h1 class="pixel-cloud-title"><span>Yume / Dream</span></h1>
+      <p class="muted">このサイトは『ゆめにっき』に着想を得た非公式のファンサイトです。<br>
+        <em>An unofficial website inspired by Yume Nikki.</em>
+      </p>
+      <!-- React mounts tab nav here -->
+      <div id="nav-root"></div>
+    </header>
+
+    <main>
+
+      <!-- ── Writing panel ───────────────────────────────────── -->
+      <div id="panel-writing">
+        <div class="grid-container">
+          <div class="grid-column">
+
+            <section id="map" class="card">
+              <h2>夢の地図 <span class="subtitle">Dream Map</span></h2>
+              <p class="muted">タイルをクリックして探索 — いくつかのタイルには小さなシーンが隠されています。<br>
+                <em>Click tiles to explore — some tiles hide small scenes.</em>
+              </p>
+              <div id="grid" class="grid"></div>
+            </section>
+
+            <section class="card">
+              <h2>について <span class="subtitle">About</span></h2>
+              <div class="about-content">
+                <img src="image.png" class="avatar" width="96" height="96">
+                <div class="about-text">
+                  <p class="about-intro">
+                    👋 こんにちは<br><br>
+                    <em>Hello, I'm Joshua Yee, also known as 'yee' both online and as a funny nickname.
+                      I am a prospective Software Engineer at UNSW and I hope you like my website!</em>
+                  </p>
+                  <div class="about-section">
+                    <h3 class="about-heading"><span class="subtitle">My Subcommittees</span></h3>
+                    <p class="about-description">
+                      <em>Illuminate subcommittee in CREATE UNSW, working on a lighting installation for Vivid Sydney.
+                        Also involved with Marketing for the CSE Revue.</em>
+                    </p>
+                  </div>
+                  <div class="about-section">
+                    <h3 class="about-heading">ゲームリスト <span class="subtitle">My Games List</span></h3>
+                    <div class="game-tags">
+                      <span class="game-tag">Counter Strike 2,</span>
+                      <span class="game-tag">Terraria,</span>
+                      <span class="game-tag">Valorant,</span>
+                      <span class="game-tag">Dark and Darker,</span>
+                    </div>
+                  </div>
+                  <div class="about-section">
+                    <h3 class="about-heading">リンク <span class="subtitle">Links</span></h3>
+                    <div class="link-buttons">
+                      <a href="https://www.linkedin.com/in/joshua-yee-604198216/" target="_blank" rel="noopener" class="link-btn">LinkedIn</a>
+                      <a href="https://github.com/jyee4187" target="_blank" rel="noopener" class="link-btn">Github</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2>リサフランク 420 <span class="subtitle">MACINTOSH PLUS</span></h2>
+              <div class="music-item">
+                <audio class="music-audio" controls preload="metadata"
+                  src="MACINTOSH PLUS - リサフランク420  現代のコンピュー (reupload).mp3"></audio>
+              </div>
+            </section>
+
+            <section class="card" id="weather-root"></section>
+
+          </div>
+          <div class="grid-column">
+
+            <section class="card">
+              <div class="yn-notebook rope-border">
+                <h2>日記 <span class="subtitle">Dream Diary</span></h2>
+                <textarea id="diaryText" class="diary-textbox" readonly></textarea>
+                <ul id="notes" class="notes-list"></ul>
+              </div>
+            </section>
+
+            <section class="card">
+              <figure class="poster">
+                <div class="poster-frame rope-border">
+                  <img src="strive_for_your_dreams.gif" class="poster-img">
+                </div>
+                <figcaption class="poster-caption">夢に向かって — Strive for your dreams</figcaption>
+              </figure>
+            </section>
+
+            <section class="card">
+              <h2>展示 <span class="subtitle">Showcase</span></h2>
+              <div class="badge-grid">
+                <img src="dreamwindows.gif" width="88" height="31">
+                <img src="d1a2009d.jpg" width="88" height="31">
+              </div>
+              <div class="mal-card">
+                <div class="mal-left"><img src="images (2).png"></div>
+                <div class="mal-right">
+                  <div class="mal-title">MyAnimeList</div>
+                  <a class="mal-link" href="https://myanimelist.net/profile/yeemega" target="_blank">
+                    myanimelist.net/profile/yeemega
+                  </a>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div><!-- /panel-writing -->
+
+
+      <!-- ── Books panel ─────────────────────────────────────── -->
+      <div id="panel-books" style="display:none">
+        <section class="card">
+          <h2>本棚 <span class="subtitle">Books</span></h2>
+          <p class="muted"><em>Shelf loading…</em></p>
+        </section>
+      </div>
+
+
+      <!-- ── Music panel ─────────────────────────────────────── -->
+      <div id="panel-music" style="display:none">
+        <div class="tool-grid">
+          <section class="card tool-card">
+            <iframe src="buzz.html" title="Buzz — distortion tool"></iframe>
+          </section>
+          <section class="card tool-card">
+            <iframe src="room.html" title="Room — reverb tool"></iframe>
+          </section>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /frame -->
+
+  <script src="script.js"></script>
+
+  <!-- React 18 — just for the tab switcher -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script>
+    (function () {
+      var h        = React.createElement;
+      var useState  = React.useState;
+      var useEffect = React.useEffect;
+
+      var TABS = [
+        { id: 'writing', label: 'Writings' },
+        { id: 'books',   label: '本棚 Books' },
+        { id: 'music',   label: '音楽 Music' },
+      ];
+
+      function TabNav() {
+        var state  = useState('writing');
+        var tab    = state[0];
+        var setTab = state[1];
+
+        useEffect(function () {
+          TABS.forEach(function (t) {
+            var el = document.getElementById('panel-' + t.id);
+            if (el) el.style.display = t.id === tab ? '' : 'none';
+          });
+        }, [tab]);
+
+        return h('nav', { className: 'main-nav' },
+          TABS.map(function (t) {
+            return h('button', {
+              key: t.id,
+              className: 'nav-link' + (tab === t.id ? ' nav-active' : ''),
+              onClick: function () { setTab(t.id); }
+            }, t.label);
+          })
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('nav-root'))
+        .render(h(TabNav, null));
+
+      // ── Weather widget ────────────────────────────────────────
+      var WMO = {
+        0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+        45:'Fog',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+        61:'Light rain',63:'Rain',65:'Heavy rain',
+        71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',
+        80:'Showers',81:'Heavy showers',82:'Violent showers',
+        95:'Thunderstorm',96:'Thunderstorm + hail',
+      };
+      function wmoEmoji(c){
+        if(c===0)return'☀️';if(c<=3)return'⛅';if(c<=48)return'🌫️';
+        if(c<=55)return'🌦️';if(c<=67)return'🌧️';if(c<=77)return'❄️';
+        if(c<=82)return'🌧️';if(c<=86)return'🌨️';return'⛈️';
+      }
+      var RAIN=[51,53,55,61,63,65,80,81,82];
+      var SNOW=[71,73,75,77,85,86];
+      function getOutfit(apparent,code,wind,rain){
+        var base=[],warn=[];
+        if(apparent<0)      base.push('heavy coat','scarf & gloves','warm boots');
+        else if(apparent<8) base.push('warm jacket','jeans','closed shoes');
+        else if(apparent<15)base.push('hoodie','jeans');
+        else if(apparent<22)base.push('t-shirt','light pants');
+        else if(apparent<28)base.push('t-shirt','shorts','sunscreen');
+        else                base.push('minimal','sunscreen','hat');
+        if(RAIN.indexOf(code)>=0||rain>50)warn.push('umbrella');
+        if(SNOW.indexOf(code)>=0)warn.push('waterproof boots');
+        if(wind>35)warn.push('windbreaker');
+        return{base:base,warn:warn};
+      }
+      function dayLabel(dateStr,i){
+        if(i===0)return'Today';if(i===1)return'Tomorrow';
+        return new Date(dateStr+'T12:00:00').toLocaleDateString('en',{weekday:'short'});
+      }
+
+      function Weather(){
+        var s=useState('loading'); var phase=s[0]; var setPhase=s[1];
+        var d=useState(null); var data=d[0]; var setData=d[1];
+
+        useEffect(function(){
+          navigator.geolocation.getCurrentPosition(function(pos){
+            var lat=pos.coords.latitude,lon=pos.coords.longitude;
+            Promise.all([
+              fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,wind_speed_10m_max,precipitation_probability_max&timezone=auto&forecast_days=7').then(function(r){return r.json();}),
+              fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lon+'&format=json').then(function(r){return r.json();})
+            ]).then(function(results){
+              var w=results[0],g=results[1],c=w.current,dd=w.daily;
+              setData({
+                city:g.address&&(g.address.city||g.address.town||g.address.suburb)||'here',
+                temp:Math.round(c.temperature_2m),
+                apparent:Math.round(c.apparent_temperature),
+                code:c.weather_code,wind:Math.round(c.wind_speed_10m),
+                days:dd.time.map(function(date,i){return{
+                  date:date,label:dayLabel(date,i),code:dd.weather_code[i],
+                  max:Math.round(dd.temperature_2m_max[i]),min:Math.round(dd.temperature_2m_min[i]),
+                  apparentMax:Math.round(dd.apparent_temperature_max[i]),
+                  wind:Math.round(dd.wind_speed_10m_max[i]),rain:dd.precipitation_probability_max[i],
+                };})
+              });
+              setPhase('done');
+            }).catch(function(){setPhase('error');});
+          },function(e){setPhase(e.code===1?'hidden':'error');},{timeout:10000});
+        },[]);
+
+        if(phase==='loading')return h('p',{className:'muted',style:{fontSize:12}},'loading weather…');
+        if(phase==='hidden'||phase==='error')return null;
+
+        var today=data.days[0];
+        var fit=getOutfit(data.apparent,data.code,data.wind,today.rain);
+
+        return h('div',null,
+          h('h2',null,
+            wmoEmoji(data.code)+' '+data.temp+'°',
+            h('span',{className:'subtitle',style:{marginLeft:8}},data.city)
+          ),
+          h('p',{className:'muted',style:{fontSize:12,margin:'4px 0 10px'}},
+            (WMO[data.code]||'')+'  ·  feels '+data.apparent+'°'
+          ),
+          h('div',{style:{display:'flex',flexWrap:'wrap',gap:6,marginBottom:14}},
+            fit.base.map(function(item){return h('span',{key:item,className:'link-btn'},item);}),
+            fit.warn.map(function(item){return h('span',{key:item,className:'link-btn',style:{borderColor:'#f7a800',color:'#f7a800'}},item);})
+          ),
+          h('div',{style:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:4}},
+            data.days.map(function(day,i){
+              return h('div',{key:day.date,style:{
+                textAlign:'center',padding:'6px 2px',fontSize:11,
+                borderTop:'1px solid '+(i===0?'var(--accent)':'#2e2537'),
+              }},
+                h('div',{className:'muted',style:{fontSize:9,marginBottom:2}},day.label.slice(0,3)),
+                h('div',{style:{fontSize:16,margin:'2px 0'}},wmoEmoji(day.code)),
+                h('div',null,day.max+'°'),
+                h('div',{className:'muted',style:{fontSize:9}},day.min+'°'),
+                day.rain>40?h('div',{style:{fontSize:9,color:'#7ab3ff'}},day.rain+'%'):null
+              );
+            })
+          )
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('weather-root'))
+        .render(h(Weather,null));
+    })();
+  </script>
+</body>
+
+</html>
