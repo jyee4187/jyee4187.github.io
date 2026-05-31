@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Budget</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --text: #d8d8d8;
+      --muted: #555;
+      --accent: #f70;
+      --green: #3d9;
+      --red: #e44;
+      --blue: #7ab3ff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 13px;
+      min-height: 100vh;
+    }
+    .shell { max-width: 820px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    h1 { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-bottom: 32px; }
+
+    /* Summary bar */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-bottom: 28px;
+    }
+    .summary-cell {
+      background: var(--surface);
+      padding: 14px 16px;
+    }
+    .summary-cell:first-child { border-radius: 2px 0 0 2px; }
+    .summary-cell:last-child  { border-radius: 0 2px 2px 0; }
+    .s-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .s-val   { font-size: 20px; font-weight: 300; letter-spacing: -0.5px; }
+    .s-val.pos { color: var(--green); }
+    .s-val.neg { color: var(--red); }
+    .s-val.warn { color: var(--accent); }
+
+    /* constraint bar */
+    .bar-wrap { margin-bottom: 28px; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+    .bar-track { height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 2px; transition: width 0.3s; }
+    .bar-fill.ok   { background: var(--green); }
+    .bar-fill.warn { background: var(--accent); }
+    .bar-fill.over { background: var(--red); }
+
+    /* sections */
+    section { margin-bottom: 24px; }
+    .section-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+    .section-title { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .section-total { font-size: 11px; color: var(--muted); }
+
+    /* rows */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 110px 90px 32px;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .row:last-of-type { border-bottom: none; }
+    .row input[type=text], .row input[type=number] {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      width: 100%;
+    }
+    .row input[type=text]::placeholder,
+    .row input[type=number]::placeholder { color: var(--muted); }
+    .row input[type=number] { text-align: right; }
+    .row .tag {
+      font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted);
+      padding: 2px 6px;
+      border: 1px solid var(--border2);
+      border-radius: 2px;
+      text-align: center;
+    }
+    .row .tag.fixed  { border-color: #3a2a1a; color: var(--accent); }
+    .row .tag.invest { border-color: #1a2a3a; color: var(--blue); }
+    .row .tag.flex   { border-color: #1a2a1a; color: var(--green); }
+    .del {
+      background: none; border: none; color: var(--border2);
+      cursor: pointer; font-size: 14px; line-height: 1;
+      transition: color 0.15s; padding: 0; text-align: center;
+    }
+    .del:hover { color: var(--red); }
+
+    /* add row */
+    .add-area {
+      display: grid;
+      grid-template-columns: 1fr 110px 90px 90px 32px;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0 0;
+    }
+    .add-area input, .add-area select {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-size: 12px;
+      font-family: inherit;
+      padding: 6px 9px;
+      border-radius: 2px;
+      outline: none;
+    }
+    .add-area input[type=number] { text-align: right; }
+    .add-area select option { background: #111; }
+    .add-btn {
+      background: none; border: 1px solid var(--border2); color: var(--muted);
+      padding: 6px 0; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+      border-radius: 2px; cursor: pointer; transition: border-color 0.15s, color 0.15s;
+    }
+    .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* investment block */
+    .invest-meta {
+      display: grid;
+      grid-template-columns: 1fr 100px 100px 100px 32px;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .invest-meta:last-of-type { border-bottom: none; }
+    .invest-meta input[type=text], .invest-meta input[type=number] {
+      background: transparent; border: none; color: var(--text);
+      font-family: inherit; font-size: 12px; outline: none; width: 100%;
+    }
+    .invest-meta input[type=number] { text-align: right; }
+    .fee-note { font-size: 10px; color: var(--muted); text-align: right; }
+
+    /* income */
+    .income-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 32px;
+      gap: 8px; align-items: center;
+      padding: 9px 0; border-bottom: 1px solid var(--border);
+    }
+    .income-row:last-of-type { border-bottom: none; }
+    .income-row input[type=text], .income-row input[type=number] {
+      background: transparent; border: none; color: var(--text);
+      font-family: inherit; font-size: 12px; outline: none; width: 100%;
+    }
+    .income-row input[type=number] { text-align: right; }
+
+    .note { font-size: 10px; color: var(--muted); padding: 10px 0 0; line-height: 1.7; }
+    .note strong { color: #888; }
+
+    @media(max-width:560px){
+      .summary { grid-template-columns: 1fr 1fr; }
+      .row { grid-template-columns: 1fr 90px 28px; }
+      .row .tag { display: none; }
+      .add-area { grid-template-columns: 1fr 90px 80px 28px; }
+      .add-area select { display: none; }
+      .invest-meta { grid-template-columns: 1fr 80px 80px 80px 28px; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <h1>Budget</h1>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-cell">
+      <div class="s-label">income</div>
+      <div class="s-val" id="totalIncome">$0</div>
+    </div>
+    <div class="summary-cell">
+      <div class="s-label">fixed out</div>
+      <div class="s-val" id="totalFixed">$0</div>
+    </div>
+    <div class="summary-cell">
+      <div class="s-label">invested</div>
+      <div class="s-val" id="totalInvested">$0</div>
+    </div>
+    <div class="summary-cell">
+      <div class="s-label">left to spend</div>
+      <div class="s-val" id="leftover">$0</div>
+    </div>
+  </div>
+
+  <!-- Constraint bar -->
+  <div class="bar-wrap">
+    <div class="bar-label">
+      <span>constraints used</span>
+      <span id="barPct">0%</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill ok" id="barFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Income section -->
+  <section id="sec-income">
+    <div class="section-head">
+      <span class="section-title">income</span>
+      <span class="section-total" id="incomeTotal">$0 / mo</span>
+    </div>
+    <div id="incomeRows"></div>
+    <div class="add-area" style="grid-template-columns:1fr 120px 32px">
+      <input type="text"   id="newIncomeName" placeholder="source (salary, freelance…)">
+      <input type="number" id="newIncomeAmt"  placeholder="0" min="0">
+      <button class="add-btn" onclick="addIncome()">+</button>
+    </div>
+  </section>
+
+  <!-- Fixed expenses -->
+  <section id="sec-fixed">
+    <div class="section-head">
+      <span class="section-title">fixed obligations <span style="color:#3a2a1a;border:1px solid #3a2a1a;padding:1px 5px;border-radius:2px;font-size:8px;margin-left:4px">gatekeeper</span></span>
+      <span class="section-total" id="fixedTotal">$0 / mo</span>
+    </div>
+    <div id="fixedRows"></div>
+    <div class="add-area">
+      <input type="text"   id="newFixedName" placeholder="rent, phone, subscription…">
+      <input type="number" id="newFixedAmt"  placeholder="0" min="0">
+      <input type="text"   id="newFixedFreq" placeholder="monthly" style="grid-column:span 1">
+      <select id="newFixedType" style="display:none"></select>
+      <button class="add-btn" onclick="addFixed()">+</button>
+    </div>
+    <p class="note">These clear <strong>first</strong> — no discretionary spending until these are covered.</p>
+  </section>
+
+  <!-- Investments -->
+  <section id="sec-invest">
+    <div class="section-head">
+      <span class="section-title">investments</span>
+      <span class="section-total" id="investTotal">$0 committed · $0 fees</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 100px 100px 100px 32px;gap:8px;padding:8px 0 4px;border-bottom:1px solid var(--border)">
+      <span style="font-size:9px;color:var(--muted);letter-spacing:1px">name</span>
+      <span style="font-size:9px;color:var(--muted);letter-spacing:1px;text-align:right">amount</span>
+      <span style="font-size:9px;color:var(--muted);letter-spacing:1px;text-align:right">fee %</span>
+      <span style="font-size:9px;color:var(--muted);letter-spacing:1px;text-align:right">fee $</span>
+      <span></span>
+    </div>
+    <div id="investRows"></div>
+    <div class="add-area">
+      <input type="text"   id="newInvestName"  placeholder="ETF, stock, crypto…">
+      <input type="number" id="newInvestAmt"   placeholder="0"    min="0" step="1">
+      <input type="number" id="newInvestFee"   placeholder="0.1"  min="0" step="0.01" title="brokerage/platform fee %">
+      <button class="add-btn" onclick="addInvest()" style="grid-column:span 2">+</button>
+    </div>
+    <p class="note">Fee % = brokerage commission + platform fee + spread. Total fee cost shown so you see drag on deployment.</p>
+  </section>
+
+  <!-- Flex spending -->
+  <section id="sec-flex">
+    <div class="section-head">
+      <span class="section-title">discretionary <span style="font-size:9px;color:var(--muted)">(flex)</span></span>
+      <span class="section-total" id="flexTotal">$0 / mo</span>
+    </div>
+    <div id="flexRows"></div>
+    <div class="add-area">
+      <input type="text"   id="newFlexName" placeholder="food, transport, fun…">
+      <input type="number" id="newFlexAmt"  placeholder="0" min="0">
+      <input type="text"   id="newFlexBudget" placeholder="budget cap">
+      <select id="newFlexCat">
+        <option value="flex">flex</option>
+      </select>
+      <button class="add-btn" onclick="addFlex()">+</button>
+    </div>
+    <p class="note">Runs after gatekeepers are cleared and investments are deployed. What's left here is real discretionary.</p>
+  </section>
+
+</div>
+
+<script>
+// ── State ───────────────────────────────────────────────────────────────
+let income  = JSON.parse(localStorage.getItem('b_income')  || '[]');
+let fixed   = JSON.parse(localStorage.getItem('b_fixed')   || '[]');
+let invests = JSON.parse(localStorage.getItem('b_invest')  || '[]');
+let flex    = JSON.parse(localStorage.getItem('b_flex')    || '[]');
+
+function save() {
+  localStorage.setItem('b_income',  JSON.stringify(income));
+  localStorage.setItem('b_fixed',   JSON.stringify(fixed));
+  localStorage.setItem('b_invest',  JSON.stringify(invests));
+  localStorage.setItem('b_flex',    JSON.stringify(flex));
+}
+
+function fmt(n) {
+  if (n == null || isNaN(n)) return '$0';
+  const abs = Math.abs(n);
+  const str = abs >= 1000
+    ? '$' + (abs/1000).toFixed(1).replace(/\.0$/, '') + 'k'
+    : '$' + abs.toFixed(0);
+  return n < 0 ? '-' + str : str;
+}
+
+// ── Render ──────────────────────────────────────────────────────────────
+function render() {
+  renderIncome();
+  renderFixed();
+  renderInvest();
+  renderFlex();
+  updateSummary();
+}
+
+function renderIncome() {
+  const el = document.getElementById('incomeRows');
+  el.innerHTML = income.map((row, i) => `
+    <div class="income-row">
+      <input type="text" value="${esc(row.name)}" placeholder="source"
+        oninput="income[${i}].name=this.value;save();updateSummary()">
+      <input type="number" value="${row.amt}" min="0"
+        oninput="income[${i}].amt=parseFloat(this.value)||0;save();updateSummary()">
+      <button class="del" onclick="income.splice(${i},1);save();render()">×</button>
+    </div>`).join('');
+}
+
+function renderFixed() {
+  const el = document.getElementById('fixedRows');
+  el.innerHTML = fixed.map((row, i) => `
+    <div class="row">
+      <input type="text" value="${esc(row.name)}" placeholder="name"
+        oninput="fixed[${i}].name=this.value;save();updateSummary()">
+      <input type="number" value="${row.amt}" min="0"
+        oninput="fixed[${i}].amt=parseFloat(this.value)||0;save();updateSummary()">
+      <span class="tag fixed">fixed</span>
+      <button class="del" onclick="fixed.splice(${i},1);save();render()">×</button>
+    </div>`).join('');
+}
+
+function renderInvest() {
+  const el = document.getElementById('investRows');
+  el.innerHTML = invests.map((row, i) => {
+    const feeDollar = ((row.fee || 0) / 100) * (row.amt || 0);
+    return `
+    <div class="invest-meta">
+      <input type="text" value="${esc(row.name)}" placeholder="name"
+        oninput="invests[${i}].name=this.value;save();updateSummary()">
+      <input type="number" value="${row.amt}" min="0" style="text-align:right"
+        oninput="invests[${i}].amt=parseFloat(this.value)||0;save();renderInvest();updateSummary()">
+      <input type="number" value="${row.fee}" min="0" step="0.01" style="text-align:right"
+        oninput="invests[${i}].fee=parseFloat(this.value)||0;save();renderInvest();updateSummary()"
+        title="brokerage + platform fee %">
+      <span class="fee-note" style="color:var(--blue)">${fmt(feeDollar)}</span>
+      <button class="del" onclick="invests.splice(${i},1);save();render()">×</button>
+    </div>`;
+  }).join('');
+}
+
+function renderFlex() {
+  const el = document.getElementById('flexRows');
+  el.innerHTML = flex.map((row, i) => `
+    <div class="row">
+      <input type="text" value="${esc(row.name)}" placeholder="name"
+        oninput="flex[${i}].name=this.value;save();updateSummary()">
+      <input type="number" value="${row.amt}" min="0"
+        oninput="flex[${i}].amt=parseFloat(this.value)||0;save();updateSummary()">
+      <span class="tag flex">flex</span>
+      <button class="del" onclick="flex.splice(${i},1);save();render()">×</button>
+    </div>`).join('');
+}
+
+// ── Summary ─────────────────────────────────────────────────────────────
+function updateSummary() {
+  const totalIn   = income.reduce((s,r)  => s + (r.amt||0), 0);
+  const totalFix  = fixed.reduce((s,r)   => s + (r.amt||0), 0);
+  const totalInv  = invests.reduce((s,r) => s + (r.amt||0), 0);
+  const totalFees = invests.reduce((s,r) => s + ((r.fee||0)/100)*(r.amt||0), 0);
+  const totalFlex = flex.reduce((s,r)    => s + (r.amt||0), 0);
+  const totalOut  = totalFix + totalInv + totalFees + totalFlex;
+  const left      = totalIn - totalOut;
+  const pct       = totalIn > 0 ? Math.min((totalOut / totalIn) * 100, 100) : 0;
+
+  document.getElementById('totalIncome').textContent   = fmt(totalIn);
+  document.getElementById('totalFixed').textContent    = fmt(totalFix);
+  document.getElementById('totalInvested').textContent = fmt(totalInv);
+
+  const leftEl = document.getElementById('leftover');
+  leftEl.textContent = fmt(left);
+  leftEl.className = 's-val ' + (left < 0 ? 'neg' : left < totalIn * 0.1 ? 'warn' : 'pos');
+
+  document.getElementById('incomeTotal').textContent  = fmt(totalIn) + ' / mo';
+  document.getElementById('fixedTotal').textContent   = fmt(totalFix) + ' / mo';
+  document.getElementById('investTotal').textContent  =
+    fmt(totalInv) + ' committed · ' + fmt(totalFees) + ' fees';
+  document.getElementById('flexTotal').textContent    = fmt(totalFlex) + ' / mo';
+
+  document.getElementById('barPct').textContent = Math.round(pct) + '%';
+  const fill = document.getElementById('barFill');
+  fill.style.width = pct + '%';
+  fill.className = 'bar-fill ' + (pct < 70 ? 'ok' : pct < 90 ? 'warn' : 'over');
+}
+
+// ── Add handlers ─────────────────────────────────────────────────────────
+function addIncome() {
+  const name = document.getElementById('newIncomeName').value.trim();
+  const amt  = parseFloat(document.getElementById('newIncomeAmt').value) || 0;
+  if (!name && !amt) return;
+  income.push({ name: name || 'income', amt });
+  document.getElementById('newIncomeName').value = '';
+  document.getElementById('newIncomeAmt').value  = '';
+  save(); render();
+}
+function addFixed() {
+  const name = document.getElementById('newFixedName').value.trim();
+  const amt  = parseFloat(document.getElementById('newFixedAmt').value) || 0;
+  if (!name && !amt) return;
+  fixed.push({ name: name || 'expense', amt });
+  document.getElementById('newFixedName').value = '';
+  document.getElementById('newFixedAmt').value  = '';
+  save(); render();
+}
+function addInvest() {
+  const name = document.getElementById('newInvestName').value.trim();
+  const amt  = parseFloat(document.getElementById('newInvestAmt').value) || 0;
+  const fee  = parseFloat(document.getElementById('newInvestFee').value) || 0;
+  if (!name && !amt) return;
+  invests.push({ name: name || 'investment', amt, fee });
+  document.getElementById('newInvestName').value = '';
+  document.getElementById('newInvestAmt').value  = '';
+  document.getElementById('newInvestFee').value  = '';
+  save(); render();
+}
+function addFlex() {
+  const name = document.getElementById('newFlexName').value.trim();
+  const amt  = parseFloat(document.getElementById('newFlexAmt').value) || 0;
+  if (!name && !amt) return;
+  flex.push({ name: name || 'spending', amt });
+  document.getElementById('newFlexName').value = '';
+  document.getElementById('newFlexAmt').value  = '';
+  save(); render();
+}
+
+// ── Enter key support ────────────────────────────────────────────────────
+['newIncomeName','newIncomeAmt'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => e.key==='Enter' && addIncome())
+);
+['newFixedName','newFixedAmt','newFixedFreq'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => e.key==='Enter' && addFixed())
+);
+['newInvestName','newInvestAmt','newInvestFee'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => e.key==='Enter' && addInvest())
+);
+['newFlexName','newFlexAmt'].forEach(id =>
+  document.getElementById(id).addEventListener('keydown', e => e.key==='Enter' && addFlex())
+);
+
+function esc(s) { return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+render();
+</script>
+</body>
+</html>
