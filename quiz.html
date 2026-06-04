@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quiz</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a;
+      --red:    #e21b3c;
+      --blue:   #1368ce;
+      --yellow: #d89e00;
+      --green:  #26890c;
+    }
+    body {
+      background: var(--bg);
+      font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* ── Lobby ── */
+    #screen-lobby {
+      text-align: center;
+      max-width: 480px;
+    }
+    #screen-lobby h1 {
+      font-size: 36px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+    #screen-lobby p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+    .start-btn {
+      background: #b35cff;
+      color: #fff;
+      border: none;
+      padding: 16px 48px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .start-btn:hover { background: #9b3de0; transform: scale(1.02); }
+    .q-count { color: #444; font-size: 12px; margin-top: 16px; }
+
+    /* ── Question ── */
+    #screen-question { width: 100%; max-width: 820px; display: none; flex-direction: column; align-items: center; gap: 20px; }
+
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .q-num { font-size: 11px; color: #555; letter-spacing: 2px; text-transform: uppercase; }
+    .score-display { font-size: 11px; color: #555; letter-spacing: 1px; }
+    .timer-ring {
+      position: relative;
+      width: 52px; height: 52px; flex-shrink: 0;
+    }
+    .timer-ring svg { transform: rotate(-90deg); }
+    .timer-ring .track { fill: none; stroke: #1a1a1a; stroke-width: 5; }
+    .timer-ring .fill  { fill: none; stroke: #b35cff; stroke-width: 5;
+                          stroke-dasharray: 138; stroke-dashoffset: 0;
+                          transition: stroke-dashoffset 0.9s linear, stroke 0.3s; }
+    .timer-num {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: #fff;
+    }
+
+    .question-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 28px 32px;
+      width: 100%;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.4;
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+    .ans-btn {
+      border: none;
+      border-radius: 6px;
+      padding: 20px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      transition: opacity 0.2s, transform 0.1s;
+      min-height: 72px;
+    }
+    .ans-btn:hover:not(:disabled) { transform: scale(1.02); }
+    .ans-btn:disabled { cursor: default; }
+    .ans-btn .shape {
+      width: 32px; height: 32px;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+      background: rgba(0,0,0,0.25);
+    }
+    .ans-btn.c0 { background: var(--red); }
+    .ans-btn.c1 { background: var(--blue); }
+    .ans-btn.c2 { background: var(--yellow); }
+    .ans-btn.c3 { background: var(--green); }
+    .ans-btn.correct { outline: 4px solid #fff; }
+    .ans-btn.wrong   { opacity: 0.35; }
+
+    /* ── Feedback ── */
+    #screen-feedback {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+    .feedback-emoji { font-size: 64px; }
+    .feedback-msg   { font-size: 24px; font-weight: 700; color: #fff; }
+    .feedback-sub   { font-size: 14px; color: #555; }
+    .pts-gained     { font-size: 32px; font-weight: 900; color: #b35cff; }
+
+    /* ── Results ── */
+    #screen-results {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+      max-width: 480px;
+    }
+    #screen-results h2 { font-size: 28px; font-weight: 900; color: #fff; }
+    .final-score { font-size: 64px; font-weight: 900; color: #b35cff; }
+    .final-label { font-size: 13px; color: #555; }
+    .result-bars { width: 100%; }
+    .result-row  {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .result-q { font-size: 11px; color: #555; width: 16px; text-align: right; flex-shrink: 0; }
+    .result-bar-track { flex: 1; height: 8px; background: #1a1a1a; border-radius: 4px; overflow: hidden; }
+    .result-bar-fill  { height: 100%; border-radius: 4px; }
+    .result-bar-fill.ok  { background: var(--green); }
+    .result-bar-fill.bad { background: var(--red); }
+    .result-time { font-size: 10px; color: #444; width: 36px; text-align: right; flex-shrink: 0; }
+
+    /* progress strip */
+    .progress {
+      width: 100%;
+      height: 3px;
+      background: #1a1a1a;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #b35cff;
+      transition: width 0.3s;
+    }
+
+    @media(max-width:520px) {
+      .question-card { font-size: 16px; padding: 20px; }
+      .answers { grid-template-columns: 1fr; }
+      .ans-btn { min-height: 56px; font-size: 14px; padding: 14px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Lobby -->
+<div id="screen-lobby">
+  <h1 id="quiz-title">Quiz</h1>
+  <p id="quiz-desc">Test your knowledge</p>
+  <button class="start-btn" onclick="startQuiz()">Start</button>
+  <div class="q-count" id="q-count"></div>
+</div>
+
+<!-- Question -->
+<div id="screen-question" style="display:none;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:820px">
+  <div class="top-bar">
+    <span class="q-num" id="q-num">1 / 10</span>
+    <div class="timer-ring">
+      <svg width="52" height="52" viewBox="0 0 52 52">
+        <circle class="track" cx="26" cy="26" r="22"/>
+        <circle class="fill"  cx="26" cy="26" r="22" id="timer-arc"/>
+      </svg>
+      <div class="timer-num" id="timer-num">20</div>
+    </div>
+    <span class="score-display" id="score-display">0 pts</span>
+  </div>
+  <div class="progress"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="question-card" id="q-text"></div>
+  <div class="answers" id="answers"></div>
+</div>
+
+<!-- Feedback -->
+<div id="screen-feedback" style="display:none;flex-direction:column;align-items:center;gap:16px;text-align:center">
+  <div class="feedback-emoji" id="fb-emoji"></div>
+  <div class="feedback-msg" id="fb-msg"></div>
+  <div class="pts-gained" id="fb-pts"></div>
+  <div class="feedback-sub" id="fb-sub"></div>
+</div>
+
+<!-- Results -->
+<div id="screen-results" style="display:none;flex-direction:column;align-items:center;gap:20px;text-align:center;max-width:480px">
+  <h2>Done</h2>
+  <div class="final-score" id="final-score"></div>
+  <div class="final-label">points</div>
+  <div class="result-bars" id="result-bars"></div>
+  <button class="start-btn" style="margin-top:8px" onclick="resetQuiz()">Play again</button>
+</div>
+
+<script>
+// ── Questions — edit freely ─────────────────────────────────────────────
+var QUIZ = {
+  title: 'How much do you actually know?',
+  desc:  '10 questions · 20 seconds each',
+  questions: [
+    {
+      q: 'What does CSS stand for?',
+      answers: ['Cascading Style Sheets', 'Computer Style System', 'Creative Sheet Syntax', 'Coded Styling Standard'],
+      correct: 0, time: 20
+    },
+    {
+      q: 'Which data structure uses LIFO (Last In, First Out)?',
+      answers: ['Queue', 'Stack', 'Linked List', 'Tree'],
+      correct: 1, time: 20
+    },
+    {
+      q: 'What is the time complexity of binary search?',
+      answers: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'],
+      correct: 2, time: 20
+    },
+    {
+      q: 'In React, what hook do you use to run code after a render?',
+      answers: ['useState', 'useRef', 'useEffect', 'useMemo'],
+      correct: 2, time: 15
+    },
+    {
+      q: 'What does HTTP stand for?',
+      answers: ['HyperText Transfer Protocol', 'High Transfer Text Process', 'Hosted Transfer Text Path', 'HyperText Transport Program'],
+      correct: 0, time: 15
+    },
+    {
+      q: 'Which of these is NOT a JavaScript data type?',
+      answers: ['undefined', 'boolean', 'character', 'symbol'],
+      correct: 2, time: 20
+    },
+    {
+      q: 'What does git stash do?',
+      answers: ['Deletes uncommitted changes', 'Saves uncommitted changes temporarily', 'Commits with no message', 'Pushes to remote'],
+      correct: 1, time: 20
+    },
+    {
+      q: 'What HTTP status code means "Not Found"?',
+      answers: ['200', '301', '403', '404'],
+      correct: 3, time: 15
+    },
+    {
+      q: 'Which algorithm would you use to find the shortest path in a graph?',
+      answers: ['Merge Sort', 'Dijkstra\'s', 'Binary Search', 'Bubble Sort'],
+      correct: 1, time: 20
+    },
+    {
+      q: 'What does SQL stand for?',
+      answers: ['Structured Query Language', 'Simple Question Logic', 'System Queue Layer', 'Standard Query Loop'],
+      correct: 0, time: 15
+    },
+  ]
+};
+
+// ── State ───────────────────────────────────────────────────────────────
+var idx = 0, score = 0, timer = null, timeLeft = 0;
+var results = [];
+var SHAPES = ['▲', '●', '■', '♦'];
+var MAXPTS = 1000;
+
+document.getElementById('quiz-title').textContent = QUIZ.title;
+document.getElementById('quiz-desc').textContent  = QUIZ.desc;
+document.getElementById('q-count').textContent    = QUIZ.questions.length + ' questions';
+
+function startQuiz() {
+  idx = 0; score = 0; results = [];
+  show('screen-question');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  var q = QUIZ.questions[idx];
+  timeLeft = q.time;
+
+  document.getElementById('q-num').textContent = (idx+1) + ' / ' + QUIZ.questions.length;
+  document.getElementById('score-display').textContent = score.toLocaleString() + ' pts';
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prog-fill').style.width = (idx / QUIZ.questions.length * 100) + '%';
+
+  var box = document.getElementById('answers');
+  box.innerHTML = '';
+  q.answers.forEach(function(ans, i) {
+    var btn = document.createElement('button');
+    btn.className = 'ans-btn c' + i;
+    btn.innerHTML = '<span class="shape">' + SHAPES[i] + '</span>' + ans;
+    btn.onclick = function() { pick(i); };
+    box.appendChild(btn);
+  });
+
+  startTimer(q.time);
+}
+
+function startTimer(secs) {
+  clearInterval(timer);
+  var arc = document.getElementById('timer-arc');
+  var num = document.getElementById('timer-num');
+  var circ = 2 * Math.PI * 22;
+  timeLeft = secs;
+  var start = Date.now();
+
+  timer = setInterval(function() {
+    var elapsed = (Date.now() - start) / 1000;
+    timeLeft = Math.max(0, secs - elapsed);
+    var frac = timeLeft / secs;
+    arc.style.strokeDashoffset = circ * (1 - frac);
+    arc.style.stroke = frac > 0.4 ? '#b35cff' : frac > 0.2 ? '#f7a800' : '#e21b3c';
+    num.textContent = Math.ceil(timeLeft);
+    if (timeLeft <= 0) { clearInterval(timer); pick(-1); }
+  }, 80);
+}
+
+function pick(chosen) {
+  clearInterval(timer);
+  var q = QUIZ.questions[idx];
+  var correct = q.correct;
+  var correct_ans = chosen === correct;
+  var pts = correct_ans ? Math.round(MAXPTS * (timeLeft / q.time)) : 0;
+  score += pts;
+
+  results.push({ correct: correct_ans, time: q.time - timeLeft });
+
+  var btns = document.querySelectorAll('.ans-btn');
+  btns.forEach(function(b, i) {
+    b.disabled = true;
+    if (i === correct) b.classList.add('correct');
+    else if (i === chosen) b.classList.add('wrong');
+    else b.classList.add('wrong');
+  });
+
+  setTimeout(function() { showFeedback(correct_ans, pts, q.answers[correct]); }, 800);
+}
+
+function showFeedback(correct, pts, correctAns) {
+  document.getElementById('fb-emoji').textContent = correct ? '✅' : '❌';
+  document.getElementById('fb-msg').textContent   = correct ? ['Correct!', 'Nice!', 'Got it!', 'Let\'s go!'][Math.floor(Math.random()*4)] : 'Wrong';
+  document.getElementById('fb-pts').textContent   = correct ? '+' + pts + ' pts' : '';
+  document.getElementById('fb-sub').textContent   = correct ? '' : 'Answer: ' + correctAns;
+  show('screen-feedback');
+
+  setTimeout(function() {
+    idx++;
+    if (idx < QUIZ.questions.length) {
+      show('screen-question');
+      loadQuestion();
+    } else {
+      showResults();
+    }
+  }, 1600);
+}
+
+function showResults() {
+  document.getElementById('final-score').textContent = score.toLocaleString();
+  var bars = document.getElementById('result-bars');
+  bars.innerHTML = results.map(function(r, i) {
+    return '<div class="result-row">' +
+      '<span class="result-q">' + (i+1) + '</span>' +
+      '<div class="result-bar-track"><div class="result-bar-fill ' + (r.correct ? 'ok' : 'bad') + '" style="width:' + (r.correct ? Math.max(10, (1 - r.time/QUIZ.questions[i].time)*100) : 100) + '%"></div></div>' +
+      '<span class="result-time">' + (r.correct ? r.time.toFixed(1)+'s' : '✗') + '</span>' +
+    '</div>';
+  }).join('');
+  show('screen-results');
+}
+
+function resetQuiz() { show('screen-lobby'); }
+
+function show(id) {
+  ['screen-lobby','screen-question','screen-feedback','screen-results'].forEach(function(s) {
+    var el = document.getElementById(s);
+    el.style.display = s === id ? 'flex' : 'none';
+    if (s === id && (s === 'screen-question')) {
+      el.style.flexDirection = 'column';
+      el.style.alignItems = 'center';
+    }
+  });
+}
+</script>
+</body>
+</html>
