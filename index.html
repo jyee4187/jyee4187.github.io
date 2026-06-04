@@ -11,6 +11,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    /* blog-specific overrides */
+    .blog-list article { cursor: pointer; }
+    .blog-list article:hover { border-image-source: url("border.png"); opacity: 0.9; }
+    .post-meta { font-size: 10px; color: #555; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .post-title-sm { font-size: 13px; margin: 4px 0 8px; color: #eadeff; font-family: var(--pixel), monospace; }
+    .post-body { font-size: 13px; line-height: 1.8; color: #c8c0d8; }
+    .post-body h2 { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #7a6e8a; margin: 28px 0 10px; font-family: var(--pixel), monospace; }
+    .post-body p  { margin-bottom: 14px; }
+    .post-body hr { border: none; border-top: 1px solid #2e2537; margin: 24px 0; }
+    .post-body em { color: #b0a0c8; }
+    .post-body strong { color: #eadeff; }
+    .post-body a  { color: #b35cff; text-decoration: none; border-bottom: 1px solid #3d2557; }
+    .post-body a:hover { border-bottom-color: #b35cff; }
+    .post-body code { font-size: 11px; background: #1a1020; padding: 2px 5px; border-radius: 2px; color: #f70; }
+    .post-body blockquote { border-left: 2px solid #3d2557; padding-left: 14px; color: #7a6e8a; margin: 14px 0; }
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+    .about-compact { display: flex; gap: 12px; align-items: flex-start; }
+    .about-compact img { border-radius: 2px; flex-shrink: 0; }
+    .about-compact-text p { font-size: 12px; line-height: 1.6; color: #8a7e9a; margin-bottom: 8px; }
+    .link-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  </style>
 </head>
 
 <body>
@@ -22,91 +44,40 @@
       <p class="muted">このサイトは『ゆめにっき』に着想を得た非公式のファンサイトです。<br>
         <em>An unofficial website inspired by Yume Nikki.</em>
       </p>
-      <!-- React mounts tab nav here -->
       <div id="nav-root"></div>
     </header>
 
     <main>
 
-      <!-- ── Writing panel ───────────────────────────────────── -->
+      <!-- ── Writing / Blog panel ───────────────────────────────── -->
       <div id="panel-writing">
         <div class="grid-container">
-          <div class="grid-column">
 
-            <section id="map" class="card">
-              <h2>夢の地図 <span class="subtitle">Dream Map</span></h2>
-              <p class="muted">タイルをクリックして探索 — いくつかのタイルには小さなシーンが隠されています。<br>
-                <em>Click tiles to explore — some tiles hide small scenes.</em>
-              </p>
-              <div id="grid" class="grid"></div>
-            </section>
+          <!-- Left: blog -->
+          <div class="grid-column">
+            <div id="blog-root"></div>
+          </div>
+
+          <!-- Right: sidebar -->
+          <div class="grid-column sidebar">
 
             <section class="card">
               <h2>について <span class="subtitle">About</span></h2>
-              <div class="about-content">
-                <img src="image.png" class="avatar" width="96" height="96">
-                <div class="about-text">
-                  <p class="about-intro">
-                    👋 こんにちは<br><br>
-                    <em>Hello, I'm Joshua Yee, also known as 'yee' both online and as a funny nickname.
-                      I am a prospective Software Engineer at UNSW and I hope you like my website!</em>
-                  </p>
-                  <div class="about-section">
-                    <h3 class="about-heading"><span class="subtitle">My Subcommittees</span></h3>
-                    <p class="about-description">
-                      <em>Illuminate subcommittee in CREATE UNSW, working on a lighting installation for Vivid Sydney.
-                        Also involved with Marketing for the CSE Revue.</em>
-                    </p>
-                  </div>
-                  <div class="about-section">
-                    <h3 class="about-heading">ゲームリスト <span class="subtitle">My Games List</span></h3>
-                    <div class="game-tags">
-                      <span class="game-tag">Counter Strike 2,</span>
-                      <span class="game-tag">Terraria,</span>
-                      <span class="game-tag">Valorant,</span>
-                      <span class="game-tag">Dark and Darker,</span>
-                    </div>
-                  </div>
-                  <div class="about-section">
-                    <h3 class="about-heading">リンク <span class="subtitle">Links</span></h3>
-                    <div class="link-buttons">
-                      <a href="https://www.linkedin.com/in/joshua-yee-604198216/" target="_blank" rel="noopener" class="link-btn">LinkedIn</a>
-                      <a href="https://github.com/jyee4187" target="_blank" rel="noopener" class="link-btn">Github</a>
-                    </div>
+              <div class="about-compact">
+                <img src="image.png" width="60" height="60" alt="avatar">
+                <div class="about-compact-text">
+                  <p>Joshua Yee — yee.<br>Prospective Software Engineer at UNSW.</p>
+                  <p>Illuminate subcommittee, CREATE UNSW.<br>Marketing, CSE Revue.</p>
+                  <div class="link-row">
+                    <a href="https://www.linkedin.com/in/joshua-yee-604198216/" target="_blank" rel="noopener" class="link-btn">LinkedIn</a>
+                    <a href="https://github.com/jyee4187" target="_blank" rel="noopener" class="link-btn">Github</a>
+                    <a href="https://myanimelist.net/profile/yeemega" target="_blank" rel="noopener" class="link-btn">MAL</a>
                   </div>
                 </div>
-              </div>
-            </section>
-
-            <section class="card">
-              <h2>リサフランク 420 <span class="subtitle">MACINTOSH PLUS</span></h2>
-              <div class="music-item">
-                <audio class="music-audio" controls preload="metadata"
-                  src="MACINTOSH PLUS - リサフランク420  現代のコンピュー (reupload).mp3"></audio>
               </div>
             </section>
 
             <section class="card" id="weather-root"></section>
-
-          </div>
-          <div class="grid-column">
-
-            <section class="card">
-              <div class="yn-notebook rope-border">
-                <h2>日記 <span class="subtitle">Dream Diary</span></h2>
-                <textarea id="diaryText" class="diary-textbox" readonly></textarea>
-                <ul id="notes" class="notes-list"></ul>
-              </div>
-            </section>
-
-            <section class="card">
-              <figure class="poster">
-                <div class="poster-frame rope-border">
-                  <img src="strive_for_your_dreams.gif" class="poster-img">
-                </div>
-                <figcaption class="poster-caption">夢に向かって — Strive for your dreams</figcaption>
-              </figure>
-            </section>
 
             <section class="card">
               <h2>展示 <span class="subtitle">Showcase</span></h2>
@@ -114,15 +85,12 @@
                 <img src="dreamwindows.gif" width="88" height="31">
                 <img src="d1a2009d.jpg" width="88" height="31">
               </div>
-              <div class="mal-card">
-                <div class="mal-left"><img src="images (2).png"></div>
-                <div class="mal-right">
-                  <div class="mal-title">MyAnimeList</div>
-                  <a class="mal-link" href="https://myanimelist.net/profile/yeemega" target="_blank">
-                    myanimelist.net/profile/yeemega
-                  </a>
-                </div>
-              </div>
+            </section>
+
+            <section class="card">
+              <h2>リサフランク 420 <span class="subtitle">MACINTOSH PLUS</span></h2>
+              <audio style="width:100%;margin-top:6px" controls preload="metadata"
+                src="MACINTOSH PLUS - リサフランク420  現代のコンピュー (reupload).mp3"></audio>
             </section>
 
           </div>
@@ -151,13 +119,14 @@
         </div>
       </div>
 
-
     </main>
   </div><!-- /frame -->
 
   <script src="script.js"></script>
+  <script src="posts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  <!-- React 18 — just for the tab switcher -->
+  <!-- React 18 -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script>
@@ -166,6 +135,7 @@
       var useState  = React.useState;
       var useEffect = React.useEffect;
 
+      // ── Tab nav ───────────────────────────────────────────────
       var TABS = [
         { id: 'writing', label: 'Writings' },
         { id: 'books',   label: '本棚 Books' },
@@ -198,7 +168,116 @@
       ReactDOM.createRoot(document.getElementById('nav-root'))
         .render(h(TabNav, null));
 
-      // ── Weather widget ────────────────────────────────────────
+      // ── Blog ──────────────────────────────────────────────────
+      var posts = (window.POSTS || []).slice().sort(function(a,b){
+        return a.date < b.date ? 1 : -1;
+      });
+
+      function readTime(content) {
+        return Math.max(1, Math.ceil(content.trim().split(/\s+/).length / 200));
+      }
+
+      function fmtDate(d) {
+        var dt = new Date(d + 'T12:00:00');
+        return dt.getFullYear() + ' / ' +
+          String(dt.getMonth()+1).padStart(2,'0') + ' / ' +
+          String(dt.getDate()).padStart(2,'0');
+      }
+
+      function Blog() {
+        var cs = useState(null);
+        var current = cs[0]; var setCurrent = cs[1];
+
+        if (current) {
+          var idx  = posts.findIndex(function(p){ return p.slug === current.slug; });
+          var prev = idx < posts.length - 1 ? posts[idx + 1] : null;
+          var next = idx > 0 ? posts[idx - 1] : null;
+
+          return h('div', null,
+            h('button', {
+              onClick: function(){ setCurrent(null); window.scrollTo(0,0); },
+              className: 'nav-link',
+              style: { fontSize: 9, marginBottom: 14, display: 'inline-block' }
+            }, '← all posts'),
+
+            h('div', { className: 'card' },
+              h('div', { className: 'post-meta' },
+                fmtDate(current.date) + '  ·  ' + readTime(current.content) + ' min read'
+              ),
+              h('h2', { style: { fontSize: 15, margin: '6px 0 12px', color: '#eadeff' } },
+                current.title
+              ),
+              current.tags && current.tags.length
+                ? h('div', { style: { display:'flex', gap:5, marginBottom:18, flexWrap:'wrap' } },
+                    current.tags.map(function(tag){
+                      return h('span',{ key:tag, className:'nav-link', style:{fontSize:9, padding:'3px 7px'} }, tag);
+                    })
+                  )
+                : null,
+              h('div', {
+                className: 'post-body',
+                dangerouslySetInnerHTML: { __html: marked.parse(current.content) }
+              })
+            ),
+
+            (prev || next)
+              ? h('div', { style:{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:12 } },
+                  h('div', null,
+                    prev ? h('div', null,
+                      h('div', { className:'post-meta', style:{marginBottom:4} }, '← older'),
+                      h('button', {
+                        onClick: function(){ setCurrent(prev); window.scrollTo(0,0); },
+                        style:{ background:'none', border:'none', color:'#d8d8d8', cursor:'pointer', fontSize:12, textAlign:'left', padding:0, fontFamily:'inherit' }
+                      }, prev.title)
+                    ) : null
+                  ),
+                  h('div', { style:{ textAlign:'right' } },
+                    next ? h('div', null,
+                      h('div', { className:'post-meta', style:{marginBottom:4} }, 'newer →'),
+                      h('button', {
+                        onClick: function(){ setCurrent(next); window.scrollTo(0,0); },
+                        style:{ background:'none', border:'none', color:'#d8d8d8', cursor:'pointer', fontSize:12, textAlign:'right', padding:0, fontFamily:'inherit' }
+                      }, next.title)
+                    ) : null
+                  )
+                )
+              : null
+          );
+        }
+
+        // List view
+        return h('div', { className: 'blog-list' },
+          posts.length === 0
+            ? h('div', { className:'card muted' }, 'no entries yet.')
+            : posts.map(function(post){
+                return h('article', {
+                  key: post.slug,
+                  className: 'card',
+                  onClick: function(){ setCurrent(post); window.scrollTo(0,0); }
+                },
+                  h('div', { className:'post-meta' },
+                    fmtDate(post.date) + '  ·  ' + readTime(post.content) + ' min read'
+                  ),
+                  h('h3', { className:'post-title-sm' }, post.title),
+                  post.excerpt
+                    ? h('p', { className:'muted', style:{ fontSize:12, margin:0 } }, post.excerpt)
+                    : null,
+                  post.tags && post.tags.length
+                    ? h('div', { style:{ display:'flex', gap:5, marginTop:10, flexWrap:'wrap' } },
+                        post.tags.map(function(tag){
+                          return h('span',{ key:tag, className:'nav-link', style:{fontSize:9, padding:'3px 7px'} }, tag);
+                        })
+                      )
+                    : null
+                );
+              })
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('blog-root'))
+        .render(h(Blog, null));
+
+      // ── Weather ───────────────────────────────────────────────
       var WMO = {
         0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
         45:'Fog',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
